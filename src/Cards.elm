@@ -120,4 +120,6 @@ compareCardsWar c1 c2 =
 -
 
 - zrobic przycisk Usuń gracza X
+
+-
 -}
