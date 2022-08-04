@@ -10,12 +10,14 @@ import Cards exposing (..)
 import String exposing (..)
 import Players exposing (..)
 
-main =
-  Browser.sandbox { init = init, view = view, update = update }
+--main = Browser.sandbox { init = init, view = view, update = update }
+
+main = Browser.sandbox { init = init2, view = view2, update = update2 }
+
 
 type Model2 = Model2 {listaKart : List Card, listaGraczy : List String, graczDoDodania : String}
 
-
+--******************************
 
 type Model =
   Model (List Card) (List String) String
@@ -27,12 +29,7 @@ init =
   ""
 
 init2 =
-    Model2 {listaKart = deckOfCards, listaGraczy = listOfPlayers, graczDoDodania = ""}
-
-
-
-
-
+    Model2 {listaKart = deckOfCards, listaGraczy = listOfPlayers, graczDoDodania = "wpisz imie"}
 
 type Msg
   = NoOp | Dodaj Card | Usun Card | Reset | Wybierz Card | NowyPlayer | UpdateNewPlayerName String | UsunGracza String
@@ -54,14 +51,15 @@ update2 : Msg -> Model2 -> Model2
 update2 msg (Model2 m ) =
   case msg of
     NoOp -> (Model2 m)
-    Dodaj c -> Model2 { m | listaKart = m.listaKart ++ [ c ]}
-{-    Usun c -> Model ( wyrzucKarte c lc) ls s
-    Reset  -> Model (deckOfCards) ls s
-    Wybierz c -> Model [ c ] ls s
-    NowyPlayer -> (Model lc (ls ++ [ s ]) "")
-    UpdateNewPlayerName ss -> (Model lc ls ss)
-    UsunGracza imiegracza -> Model lc (deletePlayer imiegracza ls) ""-}
-    _ -> Model2 m
+    Dodaj c -> Model2 { m | listaKart = m.listaKart ++ [ c ] }
+    Usun c -> Model2 { m | listaKart = wyrzucKarte c m.listaKart }
+    Reset -> Model2 { m | listaKart = deckOfCards }
+    Wybierz c -> Model2 { m | listaKart = [c] }
+    NowyPlayer -> Model2 { m | listaGraczy = m.listaGraczy ++ [m.graczDoDodania]
+                             , graczDoDodania = ""}
+    UpdateNewPlayerName s -> Model2 { m | graczDoDodania = s }
+    UsunGracza imgr -> Model2 { m | listaGraczy = deletePlayer imgr m.listaGraczy }
+
 
 view : Model -> Html Msg
 view (Model lc ls s) =
@@ -79,6 +77,25 @@ view (Model lc ls s) =
     ,button [onClick Reset] [ text "Reset"]
     ,div [] [ listaKart lc]
     ]
+
+view2 : Model2 -> Html Msg
+view2 (Model2 m) =
+     div []
+     [ div [] [ h1 [] [ text "Wszyscy gracze"], text "Gracze" , (gracze m.listaGraczy) ]
+     ,div [] [panelWyboruKarty ]
+     ,ul [ style "background-color" "lightblue"
+                     , style "height" "30px"
+                     , style "width" "50%"
+                     ] [text "aaa" ]
+     ,div [ style "background-color" "red"
+               , style "height" "30px"
+               , style "width" "50%"
+               ] [text "aaa" ]
+     ,button [onClick Reset] [ text "Reset"]
+     ,div [] [ listaKart m.listaKart  ]
+     ]
+
+
 
 cardHtml = \x ->
     case (cardName x ) of
