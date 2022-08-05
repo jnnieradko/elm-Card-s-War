@@ -8,16 +8,17 @@ import Html.Attributes exposing (..)
 import Debug exposing (..)
 import Cards exposing (..)
 import String exposing (..)
+import List.Extra exposing (..)
 
 main = Browser.sandbox { init = init2, view = view2, update = update2 }
 
-type Model2 = Model2 {listaKart : List Card, listaGraczy : List ModelGracza, graczDoDodania : String}
+type Model2 = Model2 {listaKart : List Card, listaGraczy : List ModelGracza, graczDoDodania : String , kartyWGrze : List Card}
 
 init2 =
-    Model2 {listaKart = deckOfCards, listaGraczy = listOfPlayers2, graczDoDodania = "wpisz imie"}
+    Model2 {listaKart = deckOfCards, listaGraczy = listOfPlayers2, graczDoDodania = "", kartyWGrze = []}
 
 type Msg
-  = NoOp | Dodaj Card | Usun Card | Reset | Wybierz Card | NowyPlayer | UpdateNewPlayerName String | UsunGracza String
+  = NoOp | Dodaj Card | Usun Card | Reset | Wybierz Card | NowyPlayer | UpdateNewPlayerName String | UsunGracza String | WyrzucKartyNaStol
 
 update2 : Msg -> Model2 -> Model2
 update2 msg (Model2 m ) =
@@ -31,12 +32,36 @@ update2 msg (Model2 m ) =
                              , graczDoDodania = ""}
     UpdateNewPlayerName s -> Model2 { m | graczDoDodania = s }
     UsunGracza imgr -> Model2 { m | listaGraczy = deletePlayer imgr m.listaGraczy }
+    WyrzucKartyNaStol -> Model2 { m | kartyWGrze = kartyNaStol listOfPlayers2
+
+                                      }
+
 
 
 view2 : Model2 -> Html Msg
 view2 (Model2 m) =
      div []
-     [ div [] [ h1 [] [ text "Wszyscy gracze"], text "Gracze" , (gracze m.listaGraczy) ]
+     [ div [style "height" "400px"
+            ]
+        [div [style "display" "inline-block"
+              , style "width" "40%"
+              , style "height" "300px"
+              , style "vertical-align" "middle"
+              , style "margin" "10px"
+              ]
+         [ text "Wszyscy gracze", (gracze m.listaGraczy)]
+        ,div [style "display" "inline-block"
+            , style "vertical-align" "middle"
+            , style "width" "40%"
+            , style "height" "300px"
+            , style "margin" "10px"
+            , style "background-color" "lightgreen"
+            ] [ div [] [text "Stół"]
+                , div [] [text " Lista wyrzuconych kart"]
+                , div [] [ kartyNaStolListHtml m.kartyWGrze]
+                , div [] []
+            ]
+        ]
      ,div [] [panelWyboruKarty ]
      ,ul [ style "background-color" "lightblue"
                      , style "height" "30px"
@@ -47,7 +72,7 @@ view2 (Model2 m) =
                , style "width" "50%"
                ] [text "aaa" ]
      ,button [onClick Reset] [ text "Reset"]
-     ,div [] [ listaKart m.listaKart  ]
+     ,div [] [ listaKart m.listaKart ]
      ]
 
 
@@ -109,16 +134,36 @@ panelWyboruKolor cc =
 
 
 gracze : List ModelGracza -> Html Msg
-gracze lmg = ul [] ( (List.map (\(ModelGracza x ) -> ( li [] [text x.nazwaGracza, button [onClick (UsunGracza x.nazwaGracza) ] [text "X"] , div [] [cardsOfColorListHtml x.kartyWReku ] ])) lmg)
-      ++  [ input [ onInput (\x -> UpdateNewPlayerName x ) ] []
-      , button [onClick (NowyPlayer) ] [text "Dodaj"] ] )
+gracze lmg = ul [style "margin-top" "10px"] ( (List.map (\(ModelGracza x ) -> ( li [] [text x.nazwaGracza, button [onClick (UsunGracza x.nazwaGracza) ] [text "X"] , div [] [cardsOfColorListHtml x.kartyWReku ] ])) lmg)
+      ++  [ input [ onInput (\x -> UpdateNewPlayerName x )
+                  , style "display" "inline-block"] []
+           , button [onClick (NowyPlayer)
+                    , style "display" "inline-block"] [text "Dodaj"] ]
+      ++ [ button [onClick WyrzucKartyNaStol ] [text "WYRZUC KARTY"]] )
+  --    ++   (List.map (\(ModelGracza x ) -> (  button [onClick  (WyrzKar x.kartyWReku)] [text "Wyrzuć Kartę"] ) ) lmg)  )
 
 deletePlayer : String -> List ModelGracza -> List ModelGracza
 deletePlayer s lmg=  List.filter (\(ModelGracza nazwagr) -> not ( s == nazwagr.nazwaGracza )) lmg
 
-{-kartyGracza : List ModelGracza -> List (List Card)
-kartyGracza lmg = List.map (\(ModelGracza kargr) -> kargr.kartyWReku) lmg-}
 
 
 
+kartyNaStol : List ModelGracza -> List Card
+kartyNaStol lmgr = List.concat (List.map (\(ModelGracza x) -> (take 1 x.kartyWReku) )  lmgr)
 
+kartyNaStolListHtml : List Card -> Html Msg
+kartyNaStolListHtml lc = div [] (List.map(\x -> cardsOfColorHtml x) lc )
+
+{-
+zLc : List Card -> List Card
+zLc lc=  (take 1 lc)
+
+zad2 : List Card -> Card
+zad2 = todo ""
+-}
+
+lista : List Card
+lista = [ FaceCard King Spades,FaceCard Queen Hearts, Numeral 4 Diamonds]
+
+usunWyrzucone : Int -> List Card -> List Card
+usunWyrzucone i lc = removeAt 0 lc

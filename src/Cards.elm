@@ -7,7 +7,7 @@ test = "abc"
 
 
 type CardColor = Spades | Hearts | Clubs | Diamonds
-type Face = King | Queen | Jack | Ace
+type Face = Ace | King | Queen | Jack
 type Card = FaceCard Face CardColor | Numeral Int CardColor
 
 polishName : CardColor -> String
@@ -24,10 +24,10 @@ polishName x =
 polishNameFace : Face -> String
 polishNameFace x =
     case x of
+      Ace -> "As"
       King -> "Król"
       Queen -> "Królowa"
       Jack -> "Walet"
-      Ace -> "As"
 
 type CardNameResult = ValidName String | InvalidCard
 
@@ -37,9 +37,9 @@ cardName = \x ->
         FaceCard z y ->
             let cN = polishName y
             in ValidName (case z of
+                    Ace -> ("As " ++ cN)
                     King ->  ("Król " ++ cN)
                     Queen -> ("Królowa " ++ cN)
-                    Ace -> ("As " ++ cN)
                     Jack -> ("Walet " ++ cN)
                     )
         Numeral y z ->
@@ -73,7 +73,7 @@ allCardsOfColor cc =
 
 
 allFaces : List Face
-allFaces = [Queen,King,Jack,Ace]
+allFaces = [Ace,King,Queen,Jack]
 
 allFaceCardsOfColor : CardColor -> List Card
 allFaceCardsOfColor cc =
