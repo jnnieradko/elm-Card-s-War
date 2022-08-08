@@ -31,8 +31,11 @@ update2 msg (Model2 m ) =
     NowyPlayer -> Model2 { m | listaGraczy = m.listaGraczy ++ [ModelGracza { nazwaGracza = m.graczDoDodania, kartyWReku = [] }]
                              , graczDoDodania = ""}
     UpdateNewPlayerName s -> Model2 { m | graczDoDodania = s }
-    UsunGracza imgr -> Model2 { m | listaGraczy = deletePlayer imgr m.listaGraczy }
-    WyrzucKartyNaStol -> Model2 { m | kartyWGrze = kartyNaStol listOfPlayers2
+    UsunGracza s -> Model2 { m | listaGraczy = deletePlayer s m.listaGraczy }
+    WyrzucKartyNaStol -> Model2 { m | kartyWGrze = kartyNaStol m.listaGraczy
+                                        --, listaGraczy = usunWyrzucone (m.listaGraczy)
+
+
 
                                       }
 
@@ -140,10 +143,9 @@ gracze lmg = ul [style "margin-top" "10px"] ( (List.map (\(ModelGracza x ) -> ( 
            , button [onClick (NowyPlayer)
                     , style "display" "inline-block"] [text "Dodaj"] ]
       ++ [ button [onClick WyrzucKartyNaStol ] [text "WYRZUC KARTY"]] )
-  --    ++   (List.map (\(ModelGracza x ) -> (  button [onClick  (WyrzKar x.kartyWReku)] [text "Wyrzuć Kartę"] ) ) lmg)  )
 
 deletePlayer : String -> List ModelGracza -> List ModelGracza
-deletePlayer s lmg=  List.filter (\(ModelGracza nazwagr) -> not ( s == nazwagr.nazwaGracza )) lmg
+deletePlayer s lmg=  List.filter (\(ModelGracza x ) -> not ( s == x.nazwaGracza )) lmg
 
 
 
@@ -154,16 +156,13 @@ kartyNaStol lmgr = List.concat (List.map (\(ModelGracza x) -> (take 1 x.kartyWRe
 kartyNaStolListHtml : List Card -> Html Msg
 kartyNaStolListHtml lc = div [] (List.map(\x -> cardsOfColorHtml x) lc )
 
-{-
-zLc : List Card -> List Card
-zLc lc=  (take 1 lc)
 
-zad2 : List Card -> Card
-zad2 = todo ""
--}
 
 lista : List Card
-lista = [ FaceCard King Spades,FaceCard Queen Hearts, Numeral 4 Diamonds]
+lista = [FaceCard King Spades, FaceCard Jack Clubs,FaceCard Ace Clubs]
 
-usunWyrzucone : Int -> List Card -> List Card
-usunWyrzucone i lc = removeAt 0 lc
+
+--usunWyrzucone : List ModelGracza -> List ModelGracza
+--usunWyrzucone lmg=  List.map(\y ->  List.filter (\(ModelGracza x) -> not (y == x.kartyWReku) )) lc
+
+

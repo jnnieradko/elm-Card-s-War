@@ -5307,8 +5307,8 @@ var $author$project$Main$deletePlayer = F2(
 		return A2(
 			$elm$core$List$filter,
 			function (_v0) {
-				var nazwagr = _v0.a;
-				return !_Utils_eq(s, nazwagr.nazwaGracza);
+				var x = _v0.a;
+				return !_Utils_eq(s, x.nazwaGracza);
 			},
 			lmg);
 	});
@@ -5517,19 +5517,19 @@ var $author$project$Main$update2 = F2(
 						m,
 						{graczDoDodania: s}));
 			case 'UsunGracza':
-				var imgr = msg.a;
+				var s = msg.a;
 				return $author$project$Main$Model2(
 					_Utils_update(
 						m,
 						{
-							listaGraczy: A2($author$project$Main$deletePlayer, imgr, m.listaGraczy)
+							listaGraczy: A2($author$project$Main$deletePlayer, s, m.listaGraczy)
 						}));
 			default:
 				return $author$project$Main$Model2(
 					_Utils_update(
 						m,
 						{
-							kartyWGrze: $author$project$Main$kartyNaStol($author$project$Main$listOfPlayers2)
+							kartyWGrze: $author$project$Main$kartyNaStol(m.listaGraczy)
 						}));
 		}
 	});
