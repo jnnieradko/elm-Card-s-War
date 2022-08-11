@@ -10,159 +10,140 @@ import Cards exposing (..)
 import String exposing (..)
 import List.Extra exposing (..)
 
-main = Browser.sandbox { init = init2, view = view2, update = update2 }
+main = Browser.sandbox { init = initNew, view = viewNew, update = updateNew }
 
-type Model2 = Model2 {listaKart : List Card, listaGraczy : List ModelGracza, graczDoDodania : String , kartyWGrze : List Card}
+type  Kolej = KolejA | KolejB
 
-init2 =
-    Model2 {listaKart = deckOfCards, listaGraczy = listOfPlayers2, graczDoDodania = "", kartyWGrze = []}
+type ModelNew = GraRozpoczecie { nazwaGraczaA : String , nazwaGraczaB : String  }
+                | GraPrzebieg { nazwaGraczaA : String
+                              , nazwaGraczaB : String
+                              , rekaGraczA : List Card
+                              , rekaGraczB : List Card
+                              , kartyNaStole : (List Card,List Card)
+                              , kolej : Kolej
+                              }
+                | GraZakonczenie { nazwaGraczaWygranego : String }
 
-type Msg
-  = NoOp | Dodaj Card | Usun Card | Reset | Wybierz Card | NowyPlayer | UpdateNewPlayerName String | UsunGracza String | WyrzucKartyNaStol
+type MRozpoczecie = UpdateNameA String    --  z pola Input zapamietuje wpisany String i przekazuje do nazwy gracza A
+                  | UpdateNameB String -- z pola Input zapamietuje wpisany String i przekazuje do nazwy gracza B
+                  | StartGry     -- wysyła msg w celu zmiany modelu na GraPrzebieg
 
-update2 : Msg -> Model2 -> Model2
-update2 msg (Model2 m ) =
-  case msg of
-    NoOp -> (Model2 m)
-    Dodaj c -> Model2 { m | listaKart = m.listaKart ++ [ c ] }
-    Usun c -> Model2 { m | listaKart = wyrzucKarte c m.listaKart }
-    Reset -> Model2 { m | listaKart = deckOfCards }
-    Wybierz c -> Model2 { m | listaKart = [c] }
-    NowyPlayer -> Model2 { m | listaGraczy = m.listaGraczy ++ [ModelGracza { nazwaGracza = m.graczDoDodania, kartyWReku = [] }]
-                             , graczDoDodania = ""}
-    UpdateNewPlayerName s -> Model2 { m | graczDoDodania = s }
-    UsunGracza s -> Model2 { m | listaGraczy = deletePlayer s m.listaGraczy }
-    WyrzucKartyNaStol -> Model2 { m | kartyWGrze = kartyNaStol m.listaGraczy
-                                        --, listaGraczy = usunWyrzucone (m.listaGraczy)
+type MPrzebieg = ZagrajA (List Card)      -- rekaGraczA : List Card - Card , kartyNaStole : List Card ++ [Card] , kolej : KolejA
+               | ZagrajB (List Card)     -- rekaGraczB : List Card - Card , kartyNaStole : List Card ++ [Card] , kolej : KolejB
+               | ZbierzKartyA -- compareCardsWar zwróci Order GT , rekaGraczA : lc + kartyNaStole [lc]
+               | ZbierzKartyB -- compareCardsWar zwróci Order LT , rekaGraczA : lc + kartyNaStole [lc]
 
+type MZakonczenie = KontynuujGre        -- zmień model na GraPrzebieg z aktualnymi graczami
+                  | RozpocznijNowaGre   -- zmień model na GraRozpoczecie
 
+type Msg = NoOp
+         | MsgRozpoczecie MRozpoczecie
+         | MsgPrzebieg MPrzebieg
+         | MsgZakonczenie MZakonczenie
 
-                                      }
+initNew = GraRozpoczecie {nazwaGraczaA = "" , nazwaGraczaB = ""}
 
-
-
-view2 : Model2 -> Html Msg
-view2 (Model2 m) =
-     div []
-     [ div [style "height" "400px"
-            ]
-        [div [style "display" "inline-block"
-              , style "width" "40%"
-              , style "height" "300px"
-              , style "vertical-align" "middle"
-              , style "margin" "10px"
-              ]
-         [ text "Wszyscy gracze", (gracze m.listaGraczy)]
-        ,div [style "display" "inline-block"
-            , style "vertical-align" "middle"
-            , style "width" "40%"
-            , style "height" "300px"
-            , style "margin" "10px"
-            , style "background-color" "lightgreen"
-            ] [ div [] [text "Stół"]
-                , div [] [text " Lista wyrzuconych kart"]
-                , div [] [ kartyNaStolListHtml m.kartyWGrze]
-                , div [] []
-            ]
-        ]
-     ,div [] [panelWyboruKarty ]
-     ,ul [ style "background-color" "lightblue"
-                     , style "height" "30px"
-                     , style "width" "50%"
-                     ] [text "aaa" ]
-     ,div [ style "background-color" "red"
-               , style "height" "30px"
-               , style "width" "50%"
-               ] [text "aaa" ]
-     ,button [onClick Reset] [ text "Reset"]
-     ,div [] [ listaKart m.listaKart ]
-     ]
+updateNew : Msg -> ModelNew -> ModelNew
+updateNew msg m =
+    case (msg , m) of
+        (NoOp , _ ) -> m
+        (MsgRozpoczecie mr , GraRozpoczecie gr ) ->
+                   case mr of
+                        UpdateNameA s -> GraRozpoczecie { gr | nazwaGraczaA = s}
+                        UpdateNameB s -> GraRozpoczecie { gr | nazwaGraczaB = s}
+                        StartGry -> GraPrzebieg { nazwaGraczaA = gr.nazwaGraczaA
+                                                , nazwaGraczaB = gr.nazwaGraczaB
+                                                , rekaGraczA = Tuple.first(rozdanieKart deckOfCards)
+                                                , rekaGraczB = Tuple.second(rozdanieKart deckOfCards)
+                                                , kartyNaStole = ([], [])
+                                                , kolej = KolejA
+                                                }
+        (MsgPrzebieg mp , GraPrzebieg gp ) ->
+                   case mp of
+                        ZagrajA lc1 -> GraPrzebieg { gp | rekaGraczA = wyrzucKarte lc1 gp.rekaGraczA
+                                                      , kartyNaStole = (lc1,[])
+                                                      , kolej = KolejB }
+                        ZagrajB lc2 -> GraPrzebieg { gp | rekaGraczB = wyrzucKarte lc2 gp.rekaGraczB
+                                                      , kartyNaStole = (Tuple.first(gp.kartyNaStole) ,lc2)
+                                                      , kolej = KolejA } -- pomocnicza funkcja po Zbierz karty , funkcja która sprawdza czy jest koniec gry i czy listy kart da puste i wtedy zwraca GraZakonczenie albo gra Przebie (funkcja przyjmuje GraPrzebieg a zwraca model)
+                        ZbierzKartyA -> GraPrzebieg { gp | rekaGraczA = gp.rekaGraczA ++ Tuple.first(gp.kartyNaStole)}
+                        ZbierzKartyB -> GraPrzebieg { gp | rekaGraczB = gp.rekaGraczB ++ Tuple.second(gp.kartyNaStole)}
+                        -- co jak którys z graczy nie bedzie miał kart  rekaGraczaA = [] ??
+        (MsgZakonczenie mz , GraZakonczenie gz) ->
+                   case mz of
+                        KontynuujGre -> todo ""  --GraPrzebieg
+                        RozpocznijNowaGre -> m
+        _ -> m
 
 
-type ModelGracza = ModelGracza {nazwaGracza : String, kartyWReku : List Card }
+viewNew : ModelNew -> Html Msg
+viewNew ( x ) =
+    case x of
+        GraRozpoczecie a  ->
+                            div [] [
+                              div [style "display" "block" , style "margin-top" "10px", style "text-align" "center"] [ text "Ekran 1"]
+                            , div [style "display" "inline-block" , style "margin-top" "40px" , style "width" "50%" , style "text-align" "center"] (graczA )   -- tak powinno być , czy tak jak poniżej ????
+                            , div [style "display" "inline-block" , style "margin-top" "40px" , style "width" "50%" , style "text-align" "center"] (graczB a.nazwaGraczaB)
+                            , div [style "display" "flex" , style "margin-top" "50px", style "align-items" "center" ,style "justify-content" "center"] start
+                            ]
+        GraPrzebieg a ->    div [] [
+                            div [style "display" "block" , style "margin-top" "10px", style "text-align" "center"] [ text "Ekran 2"]
+                            , div [style "display" "inline-block" , style "margin-top" "40px" , style "width" "50%" , style "text-align" "center"] [text a.nazwaGraczaA
+                                                                                                                                                   , div [style "height" "600px",  style "border" "1px solid black" , style "margin" "0px 70px"] [kartyGracza a.rekaGraczA]
+                                                                                                                                                   , grajA (take 1 a.rekaGraczA) ]
+                            , div [style "display" "inline-block" , style "margin-top" "40px" , style "width" "50%" , style "text-align" "center"] [text a.nazwaGraczaB
+                                                                                                                                                   , div [style "height" "600px",  style "border" "1px solid black" , style "margin" "0px 70px"] [kartyGracza a.rekaGraczB]
+                                                                                                                                                   , grajB (take 1 a.rekaGraczB)]
+                            ,div [style "display" "block" , style "margin-top" "10px", style "text-align" "center"] [div [style "height" "300px", style "border" "1px solid black", style "margin-top" "40px"] [ kartyNaStole (Tuple.first(a.kartyNaStole))
+                                                                                                                                                                                                               , kartyNaStole (Tuple.second(a.kartyNaStole))]
+                                                                                                                                                                                                               , button [] [text "Zbierz karty A"], button [] [text "Zbierz karty B"]]
+                            ]
+        GraZakonczenie a -> div [] [text "Ekran 3"]
 
-listOfPlayers2 : List ModelGracza
-listOfPlayers2 = [ ModelGracza { nazwaGracza = "RoRo", kartyWReku = [ FaceCard King Spades,FaceCard Queen Hearts, Numeral 4 Diamonds] }
-                    , ModelGracza { nazwaGracza = "Jan", kartyWReku = [FaceCard Jack Clubs, Numeral 9 Spades, Numeral 10 Hearts] }
-                    , ModelGracza { nazwaGracza = "Stanislaw", kartyWReku = [FaceCard Ace Clubs, Numeral 5 Clubs, Numeral 6 Diamonds] } ]
 
 
+graczA : List(Html Msg)
+graczA  = [input [onInput (\x -> MsgRozpoczecie(UpdateNameA x))] [text ""] ]
+
+graczB : String -> List(Html Msg)
+graczB s = [input [onInput (\x -> MsgRozpoczecie(UpdateNameB x))] [text s] ]
+
+--talia Kart - rozdanie na dwie części
+rozdanieKart :  List Card -> (List Card, List Card)
+rozdanieKart lc = splitAt 26 lc
+
+start : List (Html Msg)
+start =  [button [onClick (MsgRozpoczecie( StartGry))] [text "Start Gry"]]
+
+cardHtml : Card -> Html Msg
 cardHtml = \x ->
     case (cardName x ) of
-       ValidName n -> div [onClick (Usun x) , style "border" "1px solid black"
-                                , style "margin" "3px"
-                                ,style "background-color" "pink"
+       ValidName n -> div [
+                           style "border" "1px solid black"
+                          , style "display" "flex"
+                          , style "flex-direction" "row"
+                          , style "gap" "3px"
+                          , style "margin" "3px"
+                          , style "background-color" "pink"
+                          , style "width" "30px"
+                          , style "height" "40px"
                                 ] [text n ]
        InvalidCard -> div [style "border" "1px solid red"
-                                , style "margin" "3px"] [text "bald!"]
-
-listaKart : List Card -> Html Msg
-listaKart lc = div [style "background-color" "yellow"] (List.map cardHtml lc)
+                          , style "margin" "3px"] [text "bald!"]
 
 
-cardsOfColorHtml : Card -> Html Msg
-cardsOfColorHtml = \x ->
-    case (cardName x ) of
-       ValidName n -> div [onClick (Usun x)
-                                , style "display" "inline-block"
-                                ,style "border" "1px solid black"
-                                , style "margin" "3px"
-                                ] [text n ]
-       InvalidCard -> div [style "border" "1px solid red"
-                                , style "margin" "3px"] [text "bald!"]
+kartyGracza : List Card -> Html Msg
+kartyGracza lc = div [style "display" "flex"] (List.map cardHtml lc)
 
-cardsOfColorListHtml : List Card -> Html Msg
-cardsOfColorListHtml lc = div [] (List.map(\x -> cardsOfColorHtml x) lc )
+kartyNaStole : List Card -> Html Msg
+kartyNaStole lc = div [style "background-color" "yellow"] (List.map cardHtml lc)
 
-panelWyboruKarty : Html Msg
-panelWyboruKarty = div [] (List.map panelWyboruKolor allColors)
+grajA : List Card -> Html Msg
+grajA lc = button [onClick (MsgPrzebieg(ZagrajA lc))] [text "Zagraj graczu A !"]
 
-przyciskKarty : Card -> Html Msg
-przyciskKarty x =
-        case (cardName x ) of
-           ValidName n -> div [onClick (Wybierz x) , style "border" "1px solid black"
-                                    , style "margin" "3px"
-                                    ,style "background-color" "pink"
-                                    , style "display" "inline-block"
-                                    ] [text n ]
-           InvalidCard -> div [style "border" "1px solid red"
-                                    , style "margin" "3px"] [text "bald!"]
-
-panelWyboruKolor : CardColor -> Html Msg
-panelWyboruKolor cc =
-    div []
-      [ h3 [] [text (polishName cc)]
-      , div [] ( List.map przyciskKarty (allCardsOfColor cc) )
-      ]
-
-
-gracze : List ModelGracza -> Html Msg
-gracze lmg = ul [style "margin-top" "10px"] ( (List.map (\(ModelGracza x ) -> ( li [] [text x.nazwaGracza, button [onClick (UsunGracza x.nazwaGracza) ] [text "X"] , div [] [cardsOfColorListHtml x.kartyWReku ] ])) lmg)
-      ++  [ input [ onInput (\x -> UpdateNewPlayerName x )
-                  , style "display" "inline-block"] []
-           , button [onClick (NowyPlayer)
-                    , style "display" "inline-block"] [text "Dodaj"] ]
-      ++ [ button [onClick WyrzucKartyNaStol ] [text "WYRZUC KARTY"]] )
-
-deletePlayer : String -> List ModelGracza -> List ModelGracza
-deletePlayer s lmg=  List.filter (\(ModelGracza x ) -> not ( s == x.nazwaGracza )) lmg
+grajB : List Card -> Html Msg
+grajB lc = button [onClick (MsgPrzebieg(ZagrajB lc))] [text "Zagraj graczu B !"]
 
 
 
-
-kartyNaStol : List ModelGracza -> List Card
-kartyNaStol lmgr = List.concat (List.map (\(ModelGracza x) -> (take 1 x.kartyWReku) )  lmgr)
-
-kartyNaStolListHtml : List Card -> Html Msg
-kartyNaStolListHtml lc = div [] (List.map(\x -> cardsOfColorHtml x) lc )
-
-
-
-lista : List Card
-lista = [FaceCard King Spades, FaceCard Jack Clubs,FaceCard Ace Clubs]
-
-
---usunWyrzucone : List ModelGracza -> List ModelGracza
---usunWyrzucone lmg=  List.map(\y ->  List.filter (\(ModelGracza x) -> not (y == x.kartyWReku) )) lc
-
-
+-- todo "odejmowanie kart od listy kart w reku , porównywanie kart"

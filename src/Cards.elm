@@ -38,22 +38,22 @@ cardName = \x ->
             let cN = polishName y
             in ValidName (case z of
                     Ace -> ("As " ++ cN)
-                    King ->  ("Król " ++ cN)
-                    Queen -> ("Królowa " ++ cN)
-                    Jack -> ("Walet " ++ cN)
+                    King ->  ("K " ++ cN)
+                    Queen -> ("Q " ++ cN)
+                    Jack -> ("J " ++ cN)
                     )
         Numeral y z ->
             let cN = polishName z
             in case y of
-                2 -> ValidName ("dwójka " ++ cN)
-                3 -> ValidName ("trójka " ++ cN)
-                4 -> ValidName ("czwórka " ++ cN)
-                5 -> ValidName ("piątka " ++ cN)
-                6 -> ValidName ("szóstka " ++ cN)
-                7 -> ValidName ("siódemka " ++ cN)
-                8 -> ValidName ("ósemka " ++ cN)
-                9 -> ValidName ("dziewiątka " ++ cN)
-                10 -> ValidName ("dziesiątka " ++ cN)
+                2 -> ValidName ("2" ++ cN)
+                3 -> ValidName ("3 " ++ cN)
+                4 -> ValidName ("4 " ++ cN)
+                5 -> ValidName ("5 " ++ cN)
+                6 -> ValidName ("6 " ++ cN)
+                7 -> ValidName ("7 " ++ cN)
+                8 -> ValidName ("8 " ++ cN)
+                9 -> ValidName ("9 " ++ cN)
+                10 -> ValidName ("10 " ++ cN)
                 _ -> InvalidCard
 
 
@@ -83,8 +83,10 @@ allRegularCardsOfColor: CardColor -> List Card
 allRegularCardsOfColor cc =
     List.map (\x -> Numeral x cc) numbers
 
-wyrzucKarte : Card -> List Card -> List Card
-wyrzucKarte c lc = List.filter (\x -> not ( c == x )) lc
+wyrzucKarte : List Card -> List Card -> List Card
+wyrzucKarte lc1 lc = List.concat (List.filter (\x -> not ( lc1 == x )) [lc])
+
+
 
 changeFaceToInt : Face -> Int
 changeFaceToInt f = case f of
@@ -105,12 +107,12 @@ compare1 f1 f2 = compare (changeFaceToInt f1) (changeFaceToInt f2)
         (Jack , Jack ) -> EQ
         (Jack , _ ) -> GT-}
 
-compareCardsWar : Card -> Card -> Order
+compareCardsWar : List Card -> List Card -> Order
 compareCardsWar c1 c2 =
     case (c1, c2) of
-      ( FaceCard x _ , FaceCard a _) -> compare1 x a
-      ( FaceCard y _ , Numeral x _ ) -> GT
-      ( Numeral x _ , Numeral z _ ) -> compare x z
+      ( [FaceCard x _] , [FaceCard a _]) -> compare1 x a
+      ( [FaceCard y _] , [Numeral x _] ) -> GT
+      ( [Numeral x _] , [Numeral z _] ) -> compare x z
       _ -> LT
 
 
