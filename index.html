@@ -5472,7 +5472,7 @@ var $author$project$Main$updateNew = F2(
 							default:
 								return $author$project$Main$GraPrzebieg(
 									{
-										kartyNaStole: _Utils_Tuple2(_List_Nil, _List_Nil),
+										kartyNaStole: _List_Nil,
 										kolej: $author$project$Main$KolejA,
 										nazwaGraczaA: gr.nazwaGraczaA,
 										nazwaGraczaB: gr.nazwaGraczaB,
@@ -5494,7 +5494,7 @@ var $author$project$Main$updateNew = F2(
 									_Utils_update(
 										gp,
 										{
-											kartyNaStole: _Utils_Tuple2(lc1, _List_Nil),
+											kartyNaStole: lc1,
 											kolej: $author$project$Main$KolejB,
 											rekaGraczA: A2($author$project$Cards$wyrzucKarte, lc1, gp.rekaGraczA)
 										}));
@@ -5504,7 +5504,7 @@ var $author$project$Main$updateNew = F2(
 									_Utils_update(
 										gp,
 										{
-											kartyNaStole: _Utils_Tuple2(gp.kartyNaStole.a, lc2),
+											kartyNaStole: _Utils_ap(gp.kartyNaStole, lc2),
 											kolej: $author$project$Main$KolejA,
 											rekaGraczB: A2($author$project$Cards$wyrzucKarte, lc2, gp.rekaGraczB)
 										}));
@@ -5513,14 +5513,14 @@ var $author$project$Main$updateNew = F2(
 									_Utils_update(
 										gp,
 										{
-											rekaGraczA: _Utils_ap(gp.rekaGraczA, gp.kartyNaStole.a)
+											rekaGraczA: _Utils_ap(gp.rekaGraczA, gp.kartyNaStole)
 										}));
 							default:
 								return $author$project$Main$GraPrzebieg(
 									_Utils_update(
 										gp,
 										{
-											rekaGraczB: _Utils_ap(gp.rekaGraczB, gp.kartyNaStole.b)
+											rekaGraczB: _Utils_ap(gp.rekaGraczB, gp.kartyNaStole)
 										}));
 						}
 					} else {
@@ -5637,6 +5637,15 @@ var $author$project$Main$MsgPrzebieg = function (a) {
 var $author$project$Main$ZagrajA = function (a) {
 	return {$: 'ZagrajA', a: a};
 };
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -5653,37 +5662,85 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
-var $author$project$Main$grajA = function (lc) {
-	return A2(
-		$elm$html$Html$button,
-		_List_fromArray(
-			[
-				$elm$html$Html$Events$onClick(
-				$author$project$Main$MsgPrzebieg(
-					$author$project$Main$ZagrajA(lc)))
-			]),
-		_List_fromArray(
-			[
-				$elm$html$Html$text('Zagraj graczu A !')
-			]));
-};
+var $author$project$Main$grajA = F2(
+	function (lc, mn) {
+		if (mn.$ === 'GraPrzebieg') {
+			var kolej = mn.a.kolej;
+			if (kolej.$ === 'KolejA') {
+				return A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Events$onClick(
+							$author$project$Main$MsgPrzebieg(
+								$author$project$Main$ZagrajA(lc)))
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Zagraj graczu A !')
+						]));
+			} else {
+				return A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$disabled(true)
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Zagraj graczu A !')
+						]));
+			}
+		} else {
+			return _Debug_todo(
+				'Main',
+				{
+					start: {line: 148, column: 25},
+					end: {line: 148, column: 29}
+				})('');
+		}
+	});
 var $author$project$Main$ZagrajB = function (a) {
 	return {$: 'ZagrajB', a: a};
 };
-var $author$project$Main$grajB = function (lc) {
-	return A2(
-		$elm$html$Html$button,
-		_List_fromArray(
-			[
-				$elm$html$Html$Events$onClick(
-				$author$project$Main$MsgPrzebieg(
-					$author$project$Main$ZagrajB(lc)))
-			]),
-		_List_fromArray(
-			[
-				$elm$html$Html$text('Zagraj graczu B !')
-			]));
-};
+var $author$project$Main$grajB = F2(
+	function (lc, mn) {
+		if (mn.$ === 'GraPrzebieg') {
+			var kolej = mn.a.kolej;
+			if (kolej.$ === 'KolejA') {
+				return A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$disabled(true)
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Zagraj graczu B !')
+						]));
+			} else {
+				return A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Events$onClick(
+							$author$project$Main$MsgPrzebieg(
+								$author$project$Main$ZagrajB(lc)))
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Zagraj graczu B !')
+						]));
+			}
+		} else {
+			return _Debug_todo(
+				'Main',
+				{
+					start: {line: 155, column: 25},
+					end: {line: 155, column: 29}
+				})('');
+		}
+	});
 var $author$project$Cards$InvalidCard = {$: 'InvalidCard'};
 var $author$project$Cards$ValidName = function (a) {
 	return {$: 'ValidName', a: a};
@@ -5919,8 +5976,10 @@ var $author$project$Main$viewNew = function (x) {
 									[
 										$author$project$Main$kartyGracza(a.rekaGraczA)
 									])),
-								$author$project$Main$grajA(
-								A2($elm$core$List$take, 1, a.rekaGraczA))
+								A2(
+								$author$project$Main$grajA,
+								A2($elm$core$List$take, 1, a.rekaGraczA),
+								x)
 							])),
 						A2(
 						$elm$html$Html$div,
@@ -5946,8 +6005,10 @@ var $author$project$Main$viewNew = function (x) {
 									[
 										$author$project$Main$kartyGracza(a.rekaGraczB)
 									])),
-								$author$project$Main$grajB(
-								A2($elm$core$List$take, 1, a.rekaGraczB))
+								A2(
+								$author$project$Main$grajB,
+								A2($elm$core$List$take, 1, a.rekaGraczB),
+								x)
 							])),
 						A2(
 						$elm$html$Html$div,
@@ -5969,8 +6030,7 @@ var $author$project$Main$viewNew = function (x) {
 									]),
 								_List_fromArray(
 									[
-										$author$project$Main$kartyNaStole(a.kartyNaStole.a),
-										$author$project$Main$kartyNaStole(a.kartyNaStole.b)
+										$author$project$Main$kartyNaStole(a.kartyNaStole)
 									])),
 								A2(
 								$elm$html$Html$button,

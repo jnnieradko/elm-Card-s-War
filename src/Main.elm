@@ -19,7 +19,7 @@ type ModelNew = GraRozpoczecie { nazwaGraczaA : String , nazwaGraczaB : String  
                               , nazwaGraczaB : String
                               , rekaGraczA : List Card
                               , rekaGraczB : List Card
-                              , kartyNaStole : (List Card,List Card)
+                              , kartyNaStole : List Card
                               , kolej : Kolej
                               }
                 | GraZakonczenie { nazwaGraczaWygranego : String }
@@ -55,19 +55,19 @@ updateNew msg m =
                                                 , nazwaGraczaB = gr.nazwaGraczaB
                                                 , rekaGraczA = Tuple.first(rozdanieKart deckOfCards)
                                                 , rekaGraczB = Tuple.second(rozdanieKart deckOfCards)
-                                                , kartyNaStole = ([], [])
+                                                , kartyNaStole = []
                                                 , kolej = KolejA
                                                 }
         (MsgPrzebieg mp , GraPrzebieg gp ) ->
                    case mp of
                         ZagrajA lc1 -> GraPrzebieg { gp | rekaGraczA = wyrzucKarte lc1 gp.rekaGraczA
-                                                      , kartyNaStole = (lc1,[])
+                                                      , kartyNaStole = lc1
                                                       , kolej = KolejB }
                         ZagrajB lc2 -> GraPrzebieg { gp | rekaGraczB = wyrzucKarte lc2 gp.rekaGraczB
-                                                      , kartyNaStole = (Tuple.first(gp.kartyNaStole) ,lc2)
+                                                      , kartyNaStole = gp.kartyNaStole ++ lc2
                                                       , kolej = KolejA } -- pomocnicza funkcja po Zbierz karty , funkcja która sprawdza czy jest koniec gry i czy listy kart da puste i wtedy zwraca GraZakonczenie albo gra Przebie (funkcja przyjmuje GraPrzebieg a zwraca model)
-                        ZbierzKartyA -> GraPrzebieg { gp | rekaGraczA = gp.rekaGraczA ++ Tuple.first(gp.kartyNaStole)}
-                        ZbierzKartyB -> GraPrzebieg { gp | rekaGraczB = gp.rekaGraczB ++ Tuple.second(gp.kartyNaStole)}
+                        ZbierzKartyA -> GraPrzebieg { gp | rekaGraczA = gp.rekaGraczA ++ gp.kartyNaStole}
+                        ZbierzKartyB -> GraPrzebieg { gp | rekaGraczB = gp.rekaGraczB ++ gp.kartyNaStole}
                         -- co jak którys z graczy nie bedzie miał kart  rekaGraczaA = [] ??
         (MsgZakonczenie mz , GraZakonczenie gz) ->
                    case mz of
@@ -90,12 +90,14 @@ viewNew ( x ) =
                             div [style "display" "block" , style "margin-top" "10px", style "text-align" "center"] [ text "Ekran 2"]
                             , div [style "display" "inline-block" , style "margin-top" "40px" , style "width" "50%" , style "text-align" "center"] [text a.nazwaGraczaA
                                                                                                                                                    , div [style "height" "600px",  style "border" "1px solid black" , style "margin" "0px 70px"] [kartyGracza a.rekaGraczA]
-                                                                                                                                                   , grajA (take 1 a.rekaGraczA) ]
+                                                                                                                                                   , grajA (take 1 a.rekaGraczA) x
+                                                                                                                                                   ]
                             , div [style "display" "inline-block" , style "margin-top" "40px" , style "width" "50%" , style "text-align" "center"] [text a.nazwaGraczaB
                                                                                                                                                    , div [style "height" "600px",  style "border" "1px solid black" , style "margin" "0px 70px"] [kartyGracza a.rekaGraczB]
-                                                                                                                                                   , grajB (take 1 a.rekaGraczB)]
-                            ,div [style "display" "block" , style "margin-top" "10px", style "text-align" "center"] [div [style "height" "300px", style "border" "1px solid black", style "margin-top" "40px"] [ kartyNaStole (Tuple.first(a.kartyNaStole))
-                                                                                                                                                                                                               , kartyNaStole (Tuple.second(a.kartyNaStole))]
+                                                                                                                                                   , grajB (take 1 a.rekaGraczB) x
+                                                                                                                                                   ]
+                            ,div [style "display" "block" , style "margin-top" "10px", style "text-align" "center"] [div [style "height" "300px", style "border" "1px solid black", style "margin-top" "40px"] [ kartyNaStole a.kartyNaStole
+                                                                                                                                                                                                               ]
                                                                                                                                                                                                                , button [] [text "Zbierz karty A"], button [] [text "Zbierz karty B"]]
                             ]
         GraZakonczenie a -> div [] [text "Ekran 3"]
@@ -138,12 +140,22 @@ kartyGracza lc = div [style "display" "flex"] (List.map cardHtml lc)
 kartyNaStole : List Card -> Html Msg
 kartyNaStole lc = div [style "background-color" "yellow"] (List.map cardHtml lc)
 
-grajA : List Card -> Html Msg
-grajA lc = button [onClick (MsgPrzebieg(ZagrajA lc))] [text "Zagraj graczu A !"]
+grajA : List Card -> ModelNew -> Html Msg
+grajA lc mn = case mn of
+                   GraPrzebieg { kolej } -> case kolej of
+                       KolejA -> button [onClick (MsgPrzebieg(ZagrajA lc))] [text "Zagraj graczu A !"]
+                       KolejB -> button [disabled True ] [text "Zagraj graczu A !"]
+                   _ -> todo ""
 
-grajB : List Card -> Html Msg
-grajB lc = button [onClick (MsgPrzebieg(ZagrajB lc))] [text "Zagraj graczu B !"]
+grajB : List Card -> ModelNew -> Html Msg
+grajB lc mn = case mn of
+                   GraPrzebieg { kolej } -> case kolej of
+                       KolejA -> button [ disabled True ] [text "Zagraj graczu B !"]
+                       KolejB -> button [onClick (MsgPrzebieg(ZagrajB lc))] [text "Zagraj graczu B !"]
+                   _ -> todo ""
 
 
 
--- todo "odejmowanie kart od listy kart w reku , porównywanie kart"
+
+
+

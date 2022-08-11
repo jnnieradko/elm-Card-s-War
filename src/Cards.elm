@@ -84,7 +84,11 @@ allRegularCardsOfColor cc =
     List.map (\x -> Numeral x cc) numbers
 
 wyrzucKarte : List Card -> List Card -> List Card
-wyrzucKarte lc1 lc = List.concat (List.filter (\x -> not ( lc1 == x )) [lc])
+wyrzucKarte lc1 lc = case head lc1 of
+                            Nothing -> todo ""
+                            Just x -> (List.filter (\z -> not ( x == z )) lc)
+
+--List.concat (List.filter (\x -> not ( lc1 == x )) [lc])
 
 
 
@@ -115,6 +119,8 @@ compareCardsWar c1 c2 =
       ( [Numeral x _] , [Numeral z _] ) -> compare x z
       _ -> LT
 
+
+-- czy funkcja compare powinnaprzyjmować : Tuple (nazwaGraczaA , wyrzuconaKartagraczaA) , (nazwaGraczaB , wyrzuconaKartagraczaB)
 
 {-
 - jak działaja rekordy w elmie, poczytac o rekordach
