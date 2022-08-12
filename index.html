@@ -5199,226 +5199,23 @@ var $elm$browser$Browser$sandbox = function (impl) {
 			view: impl.view
 		});
 };
-var $author$project$Main$GraPrzebieg = function (a) {
-	return {$: 'GraPrzebieg', a: a};
-};
-var $author$project$Main$KolejA = {$: 'KolejA'};
-var $author$project$Main$KolejB = {$: 'KolejB'};
+var $author$project$Cards$Ace = {$: 'Ace'};
+var $author$project$Cards$Clubs = {$: 'Clubs'};
+var $author$project$Cards$Diamonds = {$: 'Diamonds'};
 var $author$project$Cards$FaceCard = F2(
 	function (a, b) {
 		return {$: 'FaceCard', a: a, b: b};
 	});
-var $author$project$Cards$Ace = {$: 'Ace'};
+var $author$project$Main$GraPrzebieg = function (a) {
+	return {$: 'GraPrzebieg', a: a};
+};
+var $author$project$Cards$Hearts = {$: 'Hearts'};
 var $author$project$Cards$Jack = {$: 'Jack'};
 var $author$project$Cards$King = {$: 'King'};
+var $author$project$Main$KolejA = {$: 'KolejA'};
+var $author$project$Main$KolejB = {$: 'KolejB'};
 var $author$project$Cards$Queen = {$: 'Queen'};
-var $author$project$Cards$allFaces = _List_fromArray(
-	[$author$project$Cards$Ace, $author$project$Cards$King, $author$project$Cards$Queen, $author$project$Cards$Jack]);
-var $author$project$Cards$allFaceCardsOfColor = function (cc) {
-	return A2(
-		$elm$core$List$map,
-		function (x) {
-			return A2($author$project$Cards$FaceCard, x, cc);
-		},
-		$author$project$Cards$allFaces);
-};
-var $author$project$Cards$Numeral = F2(
-	function (a, b) {
-		return {$: 'Numeral', a: a, b: b};
-	});
-var $author$project$Cards$numbers = A2($elm$core$List$range, 2, 10);
-var $author$project$Cards$allRegularCardsOfColor = function (cc) {
-	return A2(
-		$elm$core$List$map,
-		function (x) {
-			return A2($author$project$Cards$Numeral, x, cc);
-		},
-		$author$project$Cards$numbers);
-};
-var $author$project$Cards$allCardsOfColor = function (cc) {
-	return _Utils_ap(
-		$author$project$Cards$allFaceCardsOfColor(cc),
-		$author$project$Cards$allRegularCardsOfColor(cc));
-};
-var $author$project$Cards$Clubs = {$: 'Clubs'};
-var $author$project$Cards$Diamonds = {$: 'Diamonds'};
-var $author$project$Cards$Hearts = {$: 'Hearts'};
 var $author$project$Cards$Spades = {$: 'Spades'};
-var $author$project$Cards$allColors = _List_fromArray(
-	[$author$project$Cards$Spades, $author$project$Cards$Hearts, $author$project$Cards$Clubs, $author$project$Cards$Diamonds]);
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $author$project$Cards$deckOfCards = $elm$core$List$concat(
-	A2($elm$core$List$map, $author$project$Cards$allCardsOfColor, $author$project$Cards$allColors));
-var $elm$core$List$drop = F2(
-	function (n, list) {
-		drop:
-		while (true) {
-			if (n <= 0) {
-				return list;
-			} else {
-				if (!list.b) {
-					return list;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs;
-					n = $temp$n;
-					list = $temp$list;
-					continue drop;
-				}
-			}
-		}
-	});
-var $elm$core$List$takeReverse = F3(
-	function (n, list, kept) {
-		takeReverse:
-		while (true) {
-			if (n <= 0) {
-				return kept;
-			} else {
-				if (!list.b) {
-					return kept;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs,
-						$temp$kept = A2($elm$core$List$cons, x, kept);
-					n = $temp$n;
-					list = $temp$list;
-					kept = $temp$kept;
-					continue takeReverse;
-				}
-			}
-		}
-	});
-var $elm$core$List$takeTailRec = F2(
-	function (n, list) {
-		return $elm$core$List$reverse(
-			A3($elm$core$List$takeReverse, n, list, _List_Nil));
-	});
-var $elm$core$List$takeFast = F3(
-	function (ctr, n, list) {
-		if (n <= 0) {
-			return _List_Nil;
-		} else {
-			var _v0 = _Utils_Tuple2(n, list);
-			_v0$1:
-			while (true) {
-				_v0$5:
-				while (true) {
-					if (!_v0.b.b) {
-						return list;
-					} else {
-						if (_v0.b.b.b) {
-							switch (_v0.a) {
-								case 1:
-									break _v0$1;
-								case 2:
-									var _v2 = _v0.b;
-									var x = _v2.a;
-									var _v3 = _v2.b;
-									var y = _v3.a;
-									return _List_fromArray(
-										[x, y]);
-								case 3:
-									if (_v0.b.b.b.b) {
-										var _v4 = _v0.b;
-										var x = _v4.a;
-										var _v5 = _v4.b;
-										var y = _v5.a;
-										var _v6 = _v5.b;
-										var z = _v6.a;
-										return _List_fromArray(
-											[x, y, z]);
-									} else {
-										break _v0$5;
-									}
-								default:
-									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
-										var _v7 = _v0.b;
-										var x = _v7.a;
-										var _v8 = _v7.b;
-										var y = _v8.a;
-										var _v9 = _v8.b;
-										var z = _v9.a;
-										var _v10 = _v9.b;
-										var w = _v10.a;
-										var tl = _v10.b;
-										return (ctr > 1000) ? A2(
-											$elm$core$List$cons,
-											x,
-											A2(
-												$elm$core$List$cons,
-												y,
-												A2(
-													$elm$core$List$cons,
-													z,
-													A2(
-														$elm$core$List$cons,
-														w,
-														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
-											$elm$core$List$cons,
-											x,
-											A2(
-												$elm$core$List$cons,
-												y,
-												A2(
-													$elm$core$List$cons,
-													z,
-													A2(
-														$elm$core$List$cons,
-														w,
-														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
-									} else {
-										break _v0$5;
-									}
-							}
-						} else {
-							if (_v0.a === 1) {
-								break _v0$1;
-							} else {
-								break _v0$5;
-							}
-						}
-					}
-				}
-				return list;
-			}
-			var _v1 = _v0.b;
-			var x = _v1.a;
-			return _List_fromArray(
-				[x]);
-		}
-	});
-var $elm$core$List$take = F2(
-	function (n, list) {
-		return A3($elm$core$List$takeFast, 0, n, list);
-	});
-var $elm_community$list_extra$List$Extra$splitAt = F2(
-	function (n, xs) {
-		return _Utils_Tuple2(
-			A2($elm$core$List$take, n, xs),
-			A2($elm$core$List$drop, n, xs));
-	});
-var $author$project$Main$rozdanieKart = function (lc) {
-	return A2($elm_community$list_extra$List$Extra$splitAt, 26, lc);
-};
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
 var $elm$core$Debug$todo = _Debug_todo;
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
@@ -5431,17 +5228,35 @@ var $elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Cards$wyrzucKarte = F2(
 	function (lc1, lc) {
-		return $elm$core$List$concat(
-			A2(
+		var _v0 = $elm$core$List$head(lc1);
+		if (_v0.$ === 'Nothing') {
+			return _Debug_todo(
+				'Cards',
+				{
+					start: {line: 88, column: 40},
+					end: {line: 88, column: 44}
+				})('');
+		} else {
+			var x = _v0.a;
+			return A2(
 				$elm$core$List$filter,
-				function (x) {
-					return !_Utils_eq(lc1, x);
+				function (z) {
+					return !_Utils_eq(x, z);
 				},
-				_List_fromArray(
-					[lc])));
+				lc);
+		}
 	});
 var $author$project$Main$updateNew = F2(
 	function (msg, m) {
@@ -5476,8 +5291,20 @@ var $author$project$Main$updateNew = F2(
 										kolej: $author$project$Main$KolejA,
 										nazwaGraczaA: gr.nazwaGraczaA,
 										nazwaGraczaB: gr.nazwaGraczaB,
-										rekaGraczA: $author$project$Main$rozdanieKart($author$project$Cards$deckOfCards).a,
-										rekaGraczB: $author$project$Main$rozdanieKart($author$project$Cards$deckOfCards).b
+										rekaGraczA: _List_fromArray(
+											[
+												A2($author$project$Cards$FaceCard, $author$project$Cards$Ace, $author$project$Cards$Spades),
+												A2($author$project$Cards$FaceCard, $author$project$Cards$Jack, $author$project$Cards$Spades),
+												A2($author$project$Cards$FaceCard, $author$project$Cards$Queen, $author$project$Cards$Hearts),
+												A2($author$project$Cards$FaceCard, $author$project$Cards$King, $author$project$Cards$Clubs)
+											]),
+										rekaGraczB: _List_fromArray(
+											[
+												A2($author$project$Cards$FaceCard, $author$project$Cards$King, $author$project$Cards$Spades),
+												A2($author$project$Cards$FaceCard, $author$project$Cards$Queen, $author$project$Cards$Spades),
+												A2($author$project$Cards$FaceCard, $author$project$Cards$Queen, $author$project$Cards$Diamonds),
+												A2($author$project$Cards$FaceCard, $author$project$Cards$Jack, $author$project$Cards$Clubs)
+											])
 									});
 						}
 					} else {
@@ -5489,39 +5316,51 @@ var $author$project$Main$updateNew = F2(
 						var gp = _v0.b.a;
 						switch (mp.$) {
 							case 'ZagrajA':
-								var lc1 = mp.a;
+								var c1 = mp.a;
 								return $author$project$Main$GraPrzebieg(
 									_Utils_update(
 										gp,
 										{
-											kartyNaStole: lc1,
+											kartyNaStole: _List_fromArray(
+												[
+													_Utils_Tuple2(c1, gp.nazwaGraczaA)
+												]),
 											kolej: $author$project$Main$KolejB,
-											rekaGraczA: A2($author$project$Cards$wyrzucKarte, lc1, gp.rekaGraczA)
+											rekaGraczA: A2(
+												$author$project$Cards$wyrzucKarte,
+												_List_fromArray(
+													[c1]),
+												gp.rekaGraczA)
 										}));
 							case 'ZagrajB':
-								var lc2 = mp.a;
+								var c2 = mp.a;
 								return $author$project$Main$GraPrzebieg(
 									_Utils_update(
 										gp,
 										{
-											kartyNaStole: _Utils_ap(gp.kartyNaStole, lc2),
+											kartyNaStole: _Utils_ap(
+												gp.kartyNaStole,
+												_List_fromArray(
+													[
+														_Utils_Tuple2(c2, gp.nazwaGraczaB)
+													])),
 											kolej: $author$project$Main$KolejA,
-											rekaGraczB: A2($author$project$Cards$wyrzucKarte, lc2, gp.rekaGraczB)
+											rekaGraczB: A2(
+												$author$project$Cards$wyrzucKarte,
+												_List_fromArray(
+													[c2]),
+												gp.rekaGraczB)
 										}));
 							case 'ZbierzKartyA':
 								return $author$project$Main$GraPrzebieg(
 									_Utils_update(
 										gp,
-										{
-											rekaGraczA: _Utils_ap(gp.rekaGraczA, gp.kartyNaStole)
-										}));
+										{rekaGraczA: gp.rekaGraczA}));
 							default:
 								return $author$project$Main$GraPrzebieg(
 									_Utils_update(
 										gp,
-										{
-											rekaGraczB: _Utils_ap(gp.rekaGraczB, gp.kartyNaStole)
-										}));
+										{rekaGraczB: gp.rekaGraczB}));
 						}
 					} else {
 						break _v0$4;
@@ -5663,7 +5502,7 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		$elm$json$Json$Decode$succeed(msg));
 };
 var $author$project$Main$grajA = F2(
-	function (lc, mn) {
+	function (c, mn) {
 		if (mn.$ === 'GraPrzebieg') {
 			var kolej = mn.a.kolej;
 			if (kolej.$ === 'KolejA') {
@@ -5673,7 +5512,7 @@ var $author$project$Main$grajA = F2(
 						[
 							$elm$html$Html$Events$onClick(
 							$author$project$Main$MsgPrzebieg(
-								$author$project$Main$ZagrajA(lc)))
+								$author$project$Main$ZagrajA(c)))
 						]),
 					_List_fromArray(
 						[
@@ -5695,8 +5534,8 @@ var $author$project$Main$grajA = F2(
 			return _Debug_todo(
 				'Main',
 				{
-					start: {line: 148, column: 25},
-					end: {line: 148, column: 29}
+					start: {line: 149, column: 25},
+					end: {line: 149, column: 29}
 				})('');
 		}
 	});
@@ -5704,7 +5543,7 @@ var $author$project$Main$ZagrajB = function (a) {
 	return {$: 'ZagrajB', a: a};
 };
 var $author$project$Main$grajB = F2(
-	function (lc, mn) {
+	function (c, mn) {
 		if (mn.$ === 'GraPrzebieg') {
 			var kolej = mn.a.kolej;
 			if (kolej.$ === 'KolejA') {
@@ -5725,7 +5564,7 @@ var $author$project$Main$grajB = F2(
 						[
 							$elm$html$Html$Events$onClick(
 							$author$project$Main$MsgPrzebieg(
-								$author$project$Main$ZagrajB(lc)))
+								$author$project$Main$ZagrajB(c)))
 						]),
 					_List_fromArray(
 						[
@@ -5736,8 +5575,8 @@ var $author$project$Main$grajB = F2(
 			return _Debug_todo(
 				'Main',
 				{
-					start: {line: 155, column: 25},
-					end: {line: 155, column: 29}
+					start: {line: 156, column: 25},
+					end: {line: 156, column: 29}
 				})('');
 		}
 	});
@@ -5857,7 +5696,7 @@ var $author$project$Main$kartyGracza = function (lc) {
 			]),
 		A2($elm$core$List$map, $author$project$Main$cardHtml, lc));
 };
-var $author$project$Main$kartyNaStole = function (lc) {
+var $author$project$Main$kartyNaStoleWGrze = function (lc) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -5865,6 +5704,84 @@ var $author$project$Main$kartyNaStole = function (lc) {
 				A2($elm$html$Html$Attributes$style, 'background-color', 'yellow')
 			]),
 		A2($elm$core$List$map, $author$project$Main$cardHtml, lc));
+};
+var $elm$core$Basics$compare = _Utils_compare;
+var $author$project$Cards$changeFaceToInt = function (f) {
+	switch (f.$) {
+		case 'Jack':
+			return 11;
+		case 'Queen':
+			return 12;
+		case 'King':
+			return 13;
+		default:
+			return 14;
+	}
+};
+var $author$project$Cards$compare1 = F2(
+	function (f1, f2) {
+		return A2(
+			$elm$core$Basics$compare,
+			$author$project$Cards$changeFaceToInt(f1),
+			$author$project$Cards$changeFaceToInt(f2));
+	});
+var $author$project$Cards$compareCardsWar = function (lc) {
+	_v0$3:
+	while (true) {
+		if (lc.b) {
+			if (lc.a.$ === 'FaceCard') {
+				if (lc.b.b) {
+					if (lc.b.a.$ === 'FaceCard') {
+						if (!lc.b.b.b) {
+							var _v1 = lc.a;
+							var x = _v1.a;
+							var _v2 = lc.b;
+							var _v3 = _v2.a;
+							var a = _v3.a;
+							return A2($author$project$Cards$compare1, x, a);
+						} else {
+							break _v0$3;
+						}
+					} else {
+						if (!lc.b.b.b) {
+							var _v4 = lc.a;
+							var y = _v4.a;
+							var _v5 = lc.b;
+							var _v6 = _v5.a;
+							var x = _v6.a;
+							return $elm$core$Basics$GT;
+						} else {
+							break _v0$3;
+						}
+					}
+				} else {
+					break _v0$3;
+				}
+			} else {
+				if ((lc.b.b && (lc.b.a.$ === 'Numeral')) && (!lc.b.b.b)) {
+					var _v7 = lc.a;
+					var x = _v7.a;
+					var _v8 = lc.b;
+					var _v9 = _v8.a;
+					var z = _v9.a;
+					return A2($elm$core$Basics$compare, x, z);
+				} else {
+					break _v0$3;
+				}
+			}
+		} else {
+			break _v0$3;
+		}
+	}
+	return $elm$core$Basics$LT;
+};
+var $author$project$Main$zTupli = $elm$core$List$map(
+	function (x) {
+		return x.a;
+	});
+var $author$project$Main$porownajKarty = function (lCS) {
+	return $author$project$Cards$compareCardsWar(
+		$author$project$Main$zTupli(lCS));
 };
 var $author$project$Main$StartGry = {$: 'StartGry'};
 var $author$project$Main$start = _List_fromArray(
@@ -5881,6 +5798,78 @@ var $author$project$Main$start = _List_fromArray(
 				$elm$html$Html$text('Start Gry')
 			]))
 	]);
+var $author$project$Main$wezKarteZReki = function (lc) {
+	var _v0 = $elm$core$List$head(lc);
+	if (_v0.$ === 'Nothing') {
+		return _Debug_todo(
+			'Main',
+			{
+				start: {line: 161, column: 36},
+				end: {line: 161, column: 40}
+			})('');
+	} else {
+		var x = _v0.a;
+		return x;
+	}
+};
+var $author$project$Main$ZbierzKartyA = {$: 'ZbierzKartyA'};
+var $author$project$Main$wygranyGracz = F2(
+	function (ord, mn) {
+		switch (ord.$) {
+			case 'GT':
+				if (mn.$ === 'GraPrzebieg') {
+					var kolej = mn.a.kolej;
+					if (kolej.$ === 'KolejA') {
+						return A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Events$onClick(
+									$author$project$Main$MsgPrzebieg($author$project$Main$ZbierzKartyA))
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Zbierz graczu A !')
+								]));
+					} else {
+						return A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$disabled(true)
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Zagraj graczu aaaaB !')
+								]));
+					}
+				} else {
+					return A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('to 1 ')
+							]));
+				}
+			case 'LT':
+				return A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('to 2 ')
+						]));
+			default:
+				return A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('to 3 ')
+						]));
+		}
+	});
 var $author$project$Main$viewNew = function (x) {
 	switch (x.$) {
 		case 'GraRozpoczecie':
@@ -5978,7 +5967,7 @@ var $author$project$Main$viewNew = function (x) {
 									])),
 								A2(
 								$author$project$Main$grajA,
-								A2($elm$core$List$take, 1, a.rekaGraczA),
+								$author$project$Main$wezKarteZReki(a.rekaGraczA),
 								x)
 							])),
 						A2(
@@ -6007,7 +5996,7 @@ var $author$project$Main$viewNew = function (x) {
 									])),
 								A2(
 								$author$project$Main$grajB,
-								A2($elm$core$List$take, 1, a.rekaGraczB),
+								$author$project$Main$wezKarteZReki(a.rekaGraczB),
 								x)
 							])),
 						A2(
@@ -6030,8 +6019,26 @@ var $author$project$Main$viewNew = function (x) {
 									]),
 								_List_fromArray(
 									[
-										$author$project$Main$kartyNaStole(a.kartyNaStole)
+										$author$project$Main$kartyNaStoleWGrze(
+										$author$project$Main$zTupli(a.kartyNaStole)),
+										A2(
+										$elm$html$Html$button,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Porównaj')
+											]))
 									])),
+								($elm$core$List$length(a.kartyNaStole) < 2) ? A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('NIC NIC NIC')
+									])) : A2(
+								$author$project$Main$wygranyGracz,
+								$author$project$Main$porownajKarty(a.kartyNaStole),
+								x),
 								A2(
 								$elm$html$Html$button,
 								_List_Nil,

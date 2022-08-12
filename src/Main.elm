@@ -19,7 +19,7 @@ type ModelNew = GraRozpoczecie { nazwaGraczaA : String , nazwaGraczaB : String  
                               , nazwaGraczaB : String
                               , rekaGraczA : List Card
                               , rekaGraczB : List Card
-                              , kartyNaStole : List Card
+                              , kartyNaStole : List (Card,String)
                               , kolej : Kolej
                               }
                 | GraZakonczenie { nazwaGraczaWygranego : String }
@@ -28,8 +28,8 @@ type MRozpoczecie = UpdateNameA String    --  z pola Input zapamietuje wpisany S
                   | UpdateNameB String -- z pola Input zapamietuje wpisany String i przekazuje do nazwy gracza B
                   | StartGry     -- wysyła msg w celu zmiany modelu na GraPrzebieg
 
-type MPrzebieg = ZagrajA (List Card)      -- rekaGraczA : List Card - Card , kartyNaStole : List Card ++ [Card] , kolej : KolejA
-               | ZagrajB (List Card)     -- rekaGraczB : List Card - Card , kartyNaStole : List Card ++ [Card] , kolej : KolejB
+type MPrzebieg = ZagrajA Card      -- rekaGraczA : List Card - Card , kartyNaStole : List Card ++ [Card] , kolej : KolejA
+               | ZagrajB Card     -- rekaGraczB : List Card - Card , kartyNaStole : List Card ++ [Card] , kolej : KolejB
                | ZbierzKartyA -- compareCardsWar zwróci Order GT , rekaGraczA : lc + kartyNaStole [lc]
                | ZbierzKartyB -- compareCardsWar zwróci Order LT , rekaGraczA : lc + kartyNaStole [lc]
 
@@ -53,21 +53,21 @@ updateNew msg m =
                         UpdateNameB s -> GraRozpoczecie { gr | nazwaGraczaB = s}
                         StartGry -> GraPrzebieg { nazwaGraczaA = gr.nazwaGraczaA
                                                 , nazwaGraczaB = gr.nazwaGraczaB
-                                                , rekaGraczA = Tuple.first(rozdanieKart deckOfCards)
-                                                , rekaGraczB = Tuple.second(rozdanieKart deckOfCards)
+                                                , rekaGraczA = {-Tuple.first(rozdanieKart deckOfCards)-} [FaceCard Ace Spades, FaceCard Jack Spades , FaceCard Queen Hearts, FaceCard King Clubs ]
+                                                , rekaGraczB = {-Tuple.second(rozdanieKart deckOfCards)-} [FaceCard King Spades,FaceCard Queen Spades , FaceCard Queen Diamonds , FaceCard Jack Clubs ]
                                                 , kartyNaStole = []
                                                 , kolej = KolejA
                                                 }
         (MsgPrzebieg mp , GraPrzebieg gp ) ->
                    case mp of
-                        ZagrajA lc1 -> GraPrzebieg { gp | rekaGraczA = wyrzucKarte lc1 gp.rekaGraczA
-                                                      , kartyNaStole = lc1
+                        ZagrajA c1 -> GraPrzebieg { gp | rekaGraczA = wyrzucKarte [c1] gp.rekaGraczA
+                                                      , kartyNaStole = [(c1,gp.nazwaGraczaA)]
                                                       , kolej = KolejB }
-                        ZagrajB lc2 -> GraPrzebieg { gp | rekaGraczB = wyrzucKarte lc2 gp.rekaGraczB
-                                                      , kartyNaStole = gp.kartyNaStole ++ lc2
+                        ZagrajB c2 -> GraPrzebieg { gp | rekaGraczB = wyrzucKarte [c2] gp.rekaGraczB
+                                                      , kartyNaStole = gp.kartyNaStole ++ [(c2,gp.nazwaGraczaB)]
                                                       , kolej = KolejA } -- pomocnicza funkcja po Zbierz karty , funkcja która sprawdza czy jest koniec gry i czy listy kart da puste i wtedy zwraca GraZakonczenie albo gra Przebie (funkcja przyjmuje GraPrzebieg a zwraca model)
-                        ZbierzKartyA -> GraPrzebieg { gp | rekaGraczA = gp.rekaGraczA ++ gp.kartyNaStole}
-                        ZbierzKartyB -> GraPrzebieg { gp | rekaGraczB = gp.rekaGraczB ++ gp.kartyNaStole}
+                        ZbierzKartyA -> GraPrzebieg { gp | rekaGraczA = gp.rekaGraczA {-++ gp.kartyNaStole-}}
+                        ZbierzKartyB -> GraPrzebieg { gp | rekaGraczB = gp.rekaGraczB {-++ gp.kartyNaStole-}}
                         -- co jak którys z graczy nie bedzie miał kart  rekaGraczaA = [] ??
         (MsgZakonczenie mz , GraZakonczenie gz) ->
                    case mz of
@@ -90,14 +90,15 @@ viewNew ( x ) =
                             div [style "display" "block" , style "margin-top" "10px", style "text-align" "center"] [ text "Ekran 2"]
                             , div [style "display" "inline-block" , style "margin-top" "40px" , style "width" "50%" , style "text-align" "center"] [text a.nazwaGraczaA
                                                                                                                                                    , div [style "height" "600px",  style "border" "1px solid black" , style "margin" "0px 70px"] [kartyGracza a.rekaGraczA]
-                                                                                                                                                   , grajA (take 1 a.rekaGraczA) x
+                                                                                                                                                   , grajA (wezKarteZReki a.rekaGraczA) x
                                                                                                                                                    ]
                             , div [style "display" "inline-block" , style "margin-top" "40px" , style "width" "50%" , style "text-align" "center"] [text a.nazwaGraczaB
                                                                                                                                                    , div [style "height" "600px",  style "border" "1px solid black" , style "margin" "0px 70px"] [kartyGracza a.rekaGraczB]
-                                                                                                                                                   , grajB (take 1 a.rekaGraczB) x
+                                                                                                                                                   , grajB (wezKarteZReki a.rekaGraczB) x
                                                                                                                                                    ]
-                            ,div [style "display" "block" , style "margin-top" "10px", style "text-align" "center"] [div [style "height" "300px", style "border" "1px solid black", style "margin-top" "40px"] [ kartyNaStole a.kartyNaStole
+                            ,div [style "display" "block" , style "margin-top" "10px", style "text-align" "center"] [div [style "height" "300px", style "border" "1px solid black", style "margin-top" "40px"] [ kartyNaStoleWGrze (zTupli a.kartyNaStole) , button [] [text "Porównaj"]
                                                                                                                                                                                                                ]
+                                                                                                                                                                                                               , if List.length (a.kartyNaStole) < 2  then div [] [text "NIC NIC NIC"]  else wygranyGracz (porownajKarty a.kartyNaStole) x
                                                                                                                                                                                                                , button [] [text "Zbierz karty A"], button [] [text "Zbierz karty B"]]
                             ]
         GraZakonczenie a -> div [] [text "Ekran 3"]
@@ -137,25 +138,43 @@ cardHtml = \x ->
 kartyGracza : List Card -> Html Msg
 kartyGracza lc = div [style "display" "flex"] (List.map cardHtml lc)
 
-kartyNaStole : List Card -> Html Msg
-kartyNaStole lc = div [style "background-color" "yellow"] (List.map cardHtml lc)
+kartyNaStoleWGrze : List Card -> Html Msg
+kartyNaStoleWGrze lc = div [style "background-color" "yellow"] (List.map cardHtml lc)
 
-grajA : List Card -> ModelNew -> Html Msg
-grajA lc mn = case mn of
+grajA : Card -> ModelNew -> Html Msg
+grajA c mn = case mn of
                    GraPrzebieg { kolej } -> case kolej of
-                       KolejA -> button [onClick (MsgPrzebieg(ZagrajA lc))] [text "Zagraj graczu A !"]
+                       KolejA -> button [onClick (MsgPrzebieg(ZagrajA c ))] [text "Zagraj graczu A !"]
                        KolejB -> button [disabled True ] [text "Zagraj graczu A !"]
                    _ -> todo ""
 
-grajB : List Card -> ModelNew -> Html Msg
-grajB lc mn = case mn of
+grajB : Card -> ModelNew -> Html Msg
+grajB c mn = case mn of
                    GraPrzebieg { kolej } -> case kolej of
                        KolejA -> button [ disabled True ] [text "Zagraj graczu B !"]
-                       KolejB -> button [onClick (MsgPrzebieg(ZagrajB lc))] [text "Zagraj graczu B !"]
+                       KolejB -> button [onClick (MsgPrzebieg(ZagrajB c))] [text "Zagraj graczu B !"]
                    _ -> todo ""
 
 
+wezKarteZReki : List Card -> Card
+wezKarteZReki lc = case head lc of
+                        Nothing -> todo ""
+                        Just x -> x
 
 
+zTupli : List (Card,String) -> List Card
+zTupli = List.map (\x -> Tuple.first x)
 
 
+porownajKarty : List (Card,String) -> Order
+porownajKarty lCS =  compareCardsWar (zTupli lCS)
+
+wygranyGracz : Order -> ModelNew -> Html Msg
+wygranyGracz ord mn = case ord of
+                            GT -> case mn of
+                                GraPrzebieg {kolej} -> case kolej of
+                                    KolejA -> button [onClick (MsgPrzebieg(ZbierzKartyA ))] [text "Zbierz graczu A !"]
+                                    KolejB -> button [ disabled True ] [text "Zagraj graczu aaaaB !"]
+                                _ -> div [] [text "to 1 "]
+                            LT -> div [] [text "to 2 "]
+                            EQ -> div [] [text "to 3 "]

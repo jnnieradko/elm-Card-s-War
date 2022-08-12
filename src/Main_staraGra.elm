@@ -166,3 +166,8 @@ lista = [FaceCard King Spades, FaceCard Jack Clubs,FaceCard Ace Clubs]
 --usunWyrzucone lmg=  List.map(\y ->  List.filter (\(ModelGracza x) -> not (y == x.kartyWReku) )) lc
 
 
+{-
+wezKarteZReki : List Card -> Card
+wezKarteZReki lc = case head lc of
+                        Nothing -> todo ""
+                        Just x -> x-}

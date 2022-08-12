@@ -111,12 +111,12 @@ compare1 f1 f2 = compare (changeFaceToInt f1) (changeFaceToInt f2)
         (Jack , Jack ) -> EQ
         (Jack , _ ) -> GT-}
 
-compareCardsWar : List Card -> List Card -> Order
-compareCardsWar c1 c2 =
-    case (c1, c2) of
-      ( [FaceCard x _] , [FaceCard a _]) -> compare1 x a
-      ( [FaceCard y _] , [Numeral x _] ) -> GT
-      ( [Numeral x _] , [Numeral z _] ) -> compare x z
+compareCardsWar : List Card -> Order
+compareCardsWar lc =
+    case lc of
+      ( [FaceCard x _ , FaceCard a _]) -> compare1 x a
+      ( [FaceCard y _ , Numeral x _ ]) -> GT
+      ( [Numeral x _ , Numeral z _ ]) -> compare x z
       _ -> LT
 
 
