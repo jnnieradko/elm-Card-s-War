@@ -5209,14 +5209,22 @@ var $author$project$Cards$FaceCard = F2(
 var $author$project$Main$GraPrzebieg = function (a) {
 	return {$: 'GraPrzebieg', a: a};
 };
+var $author$project$Main$GraZakonczenie = function (a) {
+	return {$: 'GraZakonczenie', a: a};
+};
+var $author$project$Main$GraczA = {$: 'GraczA'};
+var $author$project$Main$GraczB = {$: 'GraczB'};
 var $author$project$Cards$Hearts = {$: 'Hearts'};
 var $author$project$Cards$Jack = {$: 'Jack'};
 var $author$project$Cards$King = {$: 'King'};
 var $author$project$Main$KolejA = {$: 'KolejA'};
 var $author$project$Main$KolejB = {$: 'KolejB'};
+var $author$project$Cards$Numeral = F2(
+	function (a, b) {
+		return {$: 'Numeral', a: a, b: b};
+	});
 var $author$project$Cards$Queen = {$: 'Queen'};
 var $author$project$Cards$Spades = {$: 'Spades'};
-var $elm$core$Debug$todo = _Debug_todo;
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -5228,35 +5236,19 @@ var $elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Cards$wyrzucKarte = F2(
-	function (lc1, lc) {
-		var _v0 = $elm$core$List$head(lc1);
-		if (_v0.$ === 'Nothing') {
-			return _Debug_todo(
-				'Cards',
-				{
-					start: {line: 88, column: 40},
-					end: {line: 88, column: 44}
-				})('');
-		} else {
-			var x = _v0.a;
-			return A2(
-				$elm$core$List$filter,
-				function (z) {
-					return !_Utils_eq(x, z);
-				},
-				lc);
-		}
+	function (x, lc) {
+		return A2(
+			$elm$core$List$filter,
+			function (z) {
+				return !_Utils_eq(x, z);
+			},
+			lc);
+	});
+var $author$project$Main$zTupli = $elm$core$List$map(
+	function (x) {
+		return x.a;
 	});
 var $author$project$Main$updateNew = F2(
 	function (msg, m) {
@@ -5294,16 +5286,12 @@ var $author$project$Main$updateNew = F2(
 										rekaGraczA: _List_fromArray(
 											[
 												A2($author$project$Cards$FaceCard, $author$project$Cards$Ace, $author$project$Cards$Spades),
-												A2($author$project$Cards$FaceCard, $author$project$Cards$Jack, $author$project$Cards$Spades),
-												A2($author$project$Cards$FaceCard, $author$project$Cards$Queen, $author$project$Cards$Hearts),
-												A2($author$project$Cards$FaceCard, $author$project$Cards$King, $author$project$Cards$Clubs)
+												A2($author$project$Cards$FaceCard, $author$project$Cards$Jack, $author$project$Cards$Spades)
 											]),
 										rekaGraczB: _List_fromArray(
 											[
 												A2($author$project$Cards$FaceCard, $author$project$Cards$King, $author$project$Cards$Spades),
-												A2($author$project$Cards$FaceCard, $author$project$Cards$Queen, $author$project$Cards$Spades),
-												A2($author$project$Cards$FaceCard, $author$project$Cards$Queen, $author$project$Cards$Diamonds),
-												A2($author$project$Cards$FaceCard, $author$project$Cards$Jack, $author$project$Cards$Clubs)
+												A2($author$project$Cards$FaceCard, $author$project$Cards$Queen, $author$project$Cards$Spades)
 											])
 									});
 						}
@@ -5321,16 +5309,12 @@ var $author$project$Main$updateNew = F2(
 									_Utils_update(
 										gp,
 										{
-											kartyNaStole: _List_fromArray(
-												[
-													_Utils_Tuple2(c1, gp.nazwaGraczaA)
-												]),
+											kartyNaStole: A2(
+												$elm$core$List$cons,
+												_Utils_Tuple2(c1, $author$project$Main$GraczA),
+												gp.kartyNaStole),
 											kolej: $author$project$Main$KolejB,
-											rekaGraczA: A2(
-												$author$project$Cards$wyrzucKarte,
-												_List_fromArray(
-													[c1]),
-												gp.rekaGraczA)
+											rekaGraczA: A2($author$project$Cards$wyrzucKarte, c1, gp.rekaGraczA)
 										}));
 							case 'ZagrajB':
 								var c2 = mp.a;
@@ -5338,29 +5322,38 @@ var $author$project$Main$updateNew = F2(
 									_Utils_update(
 										gp,
 										{
-											kartyNaStole: _Utils_ap(
-												gp.kartyNaStole,
-												_List_fromArray(
-													[
-														_Utils_Tuple2(c2, gp.nazwaGraczaB)
-													])),
+											kartyNaStole: A2(
+												$elm$core$List$cons,
+												_Utils_Tuple2(c2, $author$project$Main$GraczB),
+												gp.kartyNaStole),
 											kolej: $author$project$Main$KolejA,
-											rekaGraczB: A2(
-												$author$project$Cards$wyrzucKarte,
-												_List_fromArray(
-													[c2]),
-												gp.rekaGraczB)
+											rekaGraczB: A2($author$project$Cards$wyrzucKarte, c2, gp.rekaGraczB)
 										}));
 							case 'ZbierzKartyA':
 								return $author$project$Main$GraPrzebieg(
 									_Utils_update(
 										gp,
-										{rekaGraczA: gp.rekaGraczA}));
-							default:
+										{
+											kartyNaStole: _List_Nil,
+											kolej: $author$project$Main$KolejA,
+											rekaGraczA: _Utils_ap(
+												gp.rekaGraczA,
+												$author$project$Main$zTupli(gp.kartyNaStole))
+										}));
+							case 'ZbierzKartyB':
 								return $author$project$Main$GraPrzebieg(
 									_Utils_update(
 										gp,
-										{rekaGraczB: gp.rekaGraczB}));
+										{
+											kartyNaStole: _List_Nil,
+											kolej: $author$project$Main$KolejB,
+											rekaGraczB: _Utils_ap(
+												gp.rekaGraczB,
+												$author$project$Main$zTupli(gp.kartyNaStole))
+										}));
+							default:
+								return $author$project$Main$GraZakonczenie(
+									{nazwaGraczaPrzegranego: 'Przegrany', nazwaGraczaWygranego: 'WyGRANY'});
 						}
 					} else {
 						break _v0$4;
@@ -5370,14 +5363,31 @@ var $author$project$Main$updateNew = F2(
 						var mz = _v0.a.a;
 						var gz = _v0.b.a;
 						if (mz.$ === 'KontynuujGre') {
-							return _Debug_todo(
-								'Main',
+							return $author$project$Main$GraPrzebieg(
 								{
-									start: {line: 74, column: 41},
-									end: {line: 74, column: 45}
-								})('');
+									kartyNaStole: _List_Nil,
+									kolej: $author$project$Main$KolejA,
+									nazwaGraczaA: gz.nazwaGraczaWygranego,
+									nazwaGraczaB: gz.nazwaGraczaPrzegranego,
+									rekaGraczA: _List_fromArray(
+										[
+											A2($author$project$Cards$FaceCard, $author$project$Cards$Ace, $author$project$Cards$Spades),
+											A2($author$project$Cards$FaceCard, $author$project$Cards$Jack, $author$project$Cards$Spades),
+											A2($author$project$Cards$FaceCard, $author$project$Cards$Queen, $author$project$Cards$Hearts),
+											A2($author$project$Cards$FaceCard, $author$project$Cards$King, $author$project$Cards$Clubs)
+										]),
+									rekaGraczB: _List_fromArray(
+										[
+											A2($author$project$Cards$FaceCard, $author$project$Cards$King, $author$project$Cards$Spades),
+											A2($author$project$Cards$FaceCard, $author$project$Cards$Queen, $author$project$Cards$Spades),
+											A2($author$project$Cards$FaceCard, $author$project$Cards$Queen, $author$project$Cards$Diamonds),
+											A2($author$project$Cards$FaceCard, $author$project$Cards$Jack, $author$project$Cards$Clubs),
+											A2($author$project$Cards$Numeral, 10, $author$project$Cards$Hearts)
+										])
+								});
 						} else {
-							return m;
+							return $author$project$Main$GraRozpoczecie(
+								{nazwaGraczaA: '', nazwaGraczaB: ''});
 						}
 					} else {
 						break _v0$4;
@@ -5386,7 +5396,6 @@ var $author$project$Main$updateNew = F2(
 		}
 		return m;
 	});
-var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $author$project$Main$MsgRozpoczecie = function (a) {
 	return {$: 'MsgRozpoczecie', a: a};
@@ -5476,6 +5485,155 @@ var $author$project$Main$MsgPrzebieg = function (a) {
 var $author$project$Main$ZagrajA = function (a) {
 	return {$: 'ZagrajA', a: a};
 };
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $author$project$Main$czyJegoKolej = F2(
+	function (g, mp) {
+		var _v0 = _Utils_Tuple2(g, mp.kolej);
+		_v0$2:
+		while (true) {
+			if (_v0.a.$ === 'GraczA') {
+				if (_v0.b.$ === 'KolejA') {
+					var _v1 = _v0.a;
+					var _v2 = _v0.b;
+					return true;
+				} else {
+					break _v0$2;
+				}
+			} else {
+				if (_v0.b.$ === 'KolejB') {
+					var _v3 = _v0.a;
+					var _v4 = _v0.b;
+					return true;
+				} else {
+					break _v0$2;
+				}
+			}
+		}
+		return false;
+	});
+var $elm$core$Basics$compare = _Utils_compare;
+var $author$project$Cards$changeFaceToInt = function (f) {
+	switch (f.$) {
+		case 'Jack':
+			return 11;
+		case 'Queen':
+			return 12;
+		case 'King':
+			return 13;
+		default:
+			return 14;
+	}
+};
+var $author$project$Cards$compare1 = F2(
+	function (f1, f2) {
+		return A2(
+			$elm$core$Basics$compare,
+			$author$project$Cards$changeFaceToInt(f1),
+			$author$project$Cards$changeFaceToInt(f2));
+	});
+var $author$project$Cards$compareCardsWar = F2(
+	function (c1, c2) {
+		var _v0 = _Utils_Tuple2(c1, c2);
+		if (_v0.a.$ === 'FaceCard') {
+			if (_v0.b.$ === 'FaceCard') {
+				var _v1 = _v0.a;
+				var x = _v1.a;
+				var _v2 = _v0.b;
+				var a = _v2.a;
+				return A2($author$project$Cards$compare1, x, a);
+			} else {
+				var _v3 = _v0.a;
+				var _v4 = _v0.b;
+				return $elm$core$Basics$GT;
+			}
+		} else {
+			if (_v0.b.$ === 'Numeral') {
+				var _v5 = _v0.a;
+				var x = _v5.a;
+				var _v6 = _v0.b;
+				var z = _v6.a;
+				return A2($elm$core$Basics$compare, x, z);
+			} else {
+				var _v7 = _v0.a;
+				var _v8 = _v0.b;
+				return $elm$core$Basics$LT;
+			}
+		}
+	});
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $author$project$Main$czyMoznaZebrac = function (mp) {
+	if (A2(
+		$elm$core$Basics$modBy,
+		2,
+		$elm$core$List$length(mp.kartyNaStole)) === 1) {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var _v0 = mp.kartyNaStole;
+		_v0$2:
+		while (true) {
+			if (_v0.b) {
+				if (_v0.a.b.$ === 'GraczB') {
+					if (_v0.b.b && (_v0.b.a.b.$ === 'GraczA')) {
+						var _v1 = _v0.a;
+						var cB = _v1.a;
+						var _v2 = _v1.b;
+						var _v3 = _v0.b;
+						var _v4 = _v3.a;
+						var cA = _v4.a;
+						var _v5 = _v4.b;
+						var _v6 = A2($author$project$Cards$compareCardsWar, cA, cB);
+						switch (_v6.$) {
+							case 'EQ':
+								return $elm$core$Maybe$Nothing;
+							case 'LT':
+								return $elm$core$Maybe$Just($author$project$Main$GraczB);
+							default:
+								return $elm$core$Maybe$Just($author$project$Main$GraczA);
+						}
+					} else {
+						break _v0$2;
+					}
+				} else {
+					if (_v0.b.b && (_v0.b.a.b.$ === 'GraczB')) {
+						var _v7 = _v0.a;
+						var cB = _v7.a;
+						var _v8 = _v7.b;
+						var _v9 = _v0.b;
+						var _v10 = _v9.a;
+						var cA = _v10.a;
+						var _v11 = _v10.b;
+						var _v12 = A2($author$project$Cards$compareCardsWar, cA, cB);
+						switch (_v12.$) {
+							case 'EQ':
+								return $elm$core$Maybe$Nothing;
+							case 'LT':
+								return $elm$core$Maybe$Just($author$project$Main$GraczA);
+							default:
+								return $elm$core$Maybe$Just($author$project$Main$GraczB);
+						}
+					} else {
+						break _v0$2;
+					}
+				}
+			} else {
+				break _v0$2;
+			}
+		}
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Main$isNothing = function (ma) {
+	if (ma.$ === 'Nothing') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var $author$project$Main$czyMozeZagracKarte = F2(
+	function (g, mp) {
+		return A2($author$project$Main$czyJegoKolej, g, mp) && $author$project$Main$isNothing(
+			$author$project$Main$czyMoznaZebrac(mp));
+	});
 var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
 	function (key, bool) {
@@ -5502,84 +5660,72 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		$elm$json$Json$Decode$succeed(msg));
 };
 var $author$project$Main$grajA = F2(
-	function (c, mn) {
-		if (mn.$ === 'GraPrzebieg') {
-			var kolej = mn.a.kolej;
-			if (kolej.$ === 'KolejA') {
-				return A2(
-					$elm$html$Html$button,
-					_List_fromArray(
-						[
-							$elm$html$Html$Events$onClick(
-							$author$project$Main$MsgPrzebieg(
-								$author$project$Main$ZagrajA(c)))
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Zagraj graczu A !')
-						]));
-			} else {
-				return A2(
-					$elm$html$Html$button,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$disabled(true)
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Zagraj graczu A !')
-						]));
-			}
+	function (mbc, mp) {
+		if (mbc.$ === 'Nothing') {
+			return A2($elm$html$Html$div, _List_Nil, _List_Nil);
 		} else {
-			return _Debug_todo(
-				'Main',
-				{
-					start: {line: 149, column: 25},
-					end: {line: 149, column: 29}
-				})('');
+			var c = mbc.a;
+			return A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick(
+						$author$project$Main$MsgPrzebieg(
+							$author$project$Main$ZagrajA(c))),
+						$elm$html$Html$Attributes$disabled(
+						!A2($author$project$Main$czyMozeZagracKarte, $author$project$Main$GraczA, mp))
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Zagraj graczu A !')
+					]));
 		}
 	});
 var $author$project$Main$ZagrajB = function (a) {
 	return {$: 'ZagrajB', a: a};
 };
+var $author$project$Main$ZakonczGre = {$: 'ZakonczGre'};
 var $author$project$Main$grajB = F2(
-	function (c, mn) {
-		if (mn.$ === 'GraPrzebieg') {
-			var kolej = mn.a.kolej;
-			if (kolej.$ === 'KolejA') {
-				return A2(
-					$elm$html$Html$button,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$disabled(true)
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Zagraj graczu B !')
-						]));
-			} else {
-				return A2(
-					$elm$html$Html$button,
-					_List_fromArray(
-						[
-							$elm$html$Html$Events$onClick(
-							$author$project$Main$MsgPrzebieg(
-								$author$project$Main$ZagrajB(c)))
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Zagraj graczu B !')
-						]));
-			}
+	function (mbc, mp) {
+		if (mbc.$ === 'Nothing') {
+			return (_Utils_eq(mp.rekaGraczB, _List_Nil) && _Utils_eq(mp.kartyNaStole, _List_Nil)) ? A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick(
+						$author$project$Main$MsgPrzebieg($author$project$Main$ZakonczGre))
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Przegrałeś')
+					])) : A2($elm$html$Html$div, _List_Nil, _List_Nil);
 		} else {
-			return _Debug_todo(
-				'Main',
-				{
-					start: {line: 156, column: 25},
-					end: {line: 156, column: 29}
-				})('');
+			var c = mbc.a;
+			return A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick(
+						$author$project$Main$MsgPrzebieg(
+							$author$project$Main$ZagrajB(c))),
+						$elm$html$Html$Attributes$disabled(
+						!A2($author$project$Main$czyMozeZagracKarte, $author$project$Main$GraczB, mp))
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Zagraj graczu B !')
+					]));
 		}
 	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $author$project$Cards$InvalidCard = {$: 'InvalidCard'};
 var $author$project$Cards$ValidName = function (a) {
 	return {$: 'ValidName', a: a};
@@ -5613,13 +5759,13 @@ var $author$project$Cards$cardName = function (x) {
 			function () {
 				switch (z.$) {
 					case 'Ace':
-						return 'As ' + cN;
+						return 'As' + cN;
 					case 'King':
-						return 'K ' + cN;
+						return 'K' + cN;
 					case 'Queen':
-						return 'Q ' + cN;
+						return 'Q' + cN;
 					default:
-						return 'J ' + cN;
+						return 'J' + cN;
 				}
 			}());
 	} else {
@@ -5661,11 +5807,9 @@ var $author$project$Main$cardHtml = function (x) {
 			_List_fromArray(
 				[
 					A2($elm$html$Html$Attributes$style, 'border', '1px solid black'),
-					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-					A2($elm$html$Html$Attributes$style, 'flex-direction', 'row'),
-					A2($elm$html$Html$Attributes$style, 'gap', '3px'),
-					A2($elm$html$Html$Attributes$style, 'margin', '3px'),
-					A2($elm$html$Html$Attributes$style, 'background-color', 'pink'),
+					A2($elm$html$Html$Attributes$style, 'background-color', 'lightgrey'),
+					A2($elm$html$Html$Attributes$style, 'display', 'inline-block'),
+					A2($elm$html$Html$Attributes$style, 'margin', '5px'),
 					A2($elm$html$Html$Attributes$style, 'width', '30px'),
 					A2($elm$html$Html$Attributes$style, 'height', '40px')
 				]),
@@ -5676,11 +5820,7 @@ var $author$project$Main$cardHtml = function (x) {
 	} else {
 		return A2(
 			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'border', '1px solid red'),
-					A2($elm$html$Html$Attributes$style, 'margin', '3px')
-				]),
+			_List_Nil,
 			_List_fromArray(
 				[
 					$elm$html$Html$text('bald!')
@@ -5701,87 +5841,48 @@ var $author$project$Main$kartyNaStoleWGrze = function (lc) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'background-color', 'yellow')
+				A2($elm$html$Html$Attributes$style, 'background-color', 'green'),
+				A2($elm$html$Html$Attributes$style, 'display', 'block'),
+				A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
+				A2($elm$html$Html$Attributes$style, 'margin', '10px')
 			]),
 		A2($elm$core$List$map, $author$project$Main$cardHtml, lc));
 };
-var $elm$core$Basics$compare = _Utils_compare;
-var $author$project$Cards$changeFaceToInt = function (f) {
-	switch (f.$) {
-		case 'Jack':
-			return 11;
-		case 'Queen':
-			return 12;
-		case 'King':
-			return 13;
-		default:
-			return 14;
-	}
-};
-var $author$project$Cards$compare1 = F2(
-	function (f1, f2) {
-		return A2(
-			$elm$core$Basics$compare,
-			$author$project$Cards$changeFaceToInt(f1),
-			$author$project$Cards$changeFaceToInt(f2));
-	});
-var $author$project$Cards$compareCardsWar = function (lc) {
-	_v0$3:
-	while (true) {
-		if (lc.b) {
-			if (lc.a.$ === 'FaceCard') {
-				if (lc.b.b) {
-					if (lc.b.a.$ === 'FaceCard') {
-						if (!lc.b.b.b) {
-							var _v1 = lc.a;
-							var x = _v1.a;
-							var _v2 = lc.b;
-							var _v3 = _v2.a;
-							var a = _v3.a;
-							return A2($author$project$Cards$compare1, x, a);
-						} else {
-							break _v0$3;
-						}
-					} else {
-						if (!lc.b.b.b) {
-							var _v4 = lc.a;
-							var y = _v4.a;
-							var _v5 = lc.b;
-							var _v6 = _v5.a;
-							var x = _v6.a;
-							return $elm$core$Basics$GT;
-						} else {
-							break _v0$3;
-						}
-					}
-				} else {
-					break _v0$3;
-				}
-			} else {
-				if ((lc.b.b && (lc.b.a.$ === 'Numeral')) && (!lc.b.b.b)) {
-					var _v7 = lc.a;
-					var x = _v7.a;
-					var _v8 = lc.b;
-					var _v9 = _v8.a;
-					var z = _v9.a;
-					return A2($elm$core$Basics$compare, x, z);
-				} else {
-					break _v0$3;
-				}
-			}
+var $author$project$Main$ZbierzKartyA = {$: 'ZbierzKartyA'};
+var $author$project$Main$ZbierzKartyB = {$: 'ZbierzKartyB'};
+var $author$project$Main$przyciskZebraniaKart = function (mp) {
+	var _v0 = $author$project$Main$czyMoznaZebrac(mp);
+	if (_v0.$ === 'Nothing') {
+		return A2($elm$html$Html$div, _List_Nil, _List_Nil);
+	} else {
+		if (_v0.a.$ === 'GraczA') {
+			var _v1 = _v0.a;
+			return A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick(
+						$author$project$Main$MsgPrzebieg($author$project$Main$ZbierzKartyA))
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Zbierz graczu A')
+					]));
 		} else {
-			break _v0$3;
+			var _v2 = _v0.a;
+			return A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick(
+						$author$project$Main$MsgPrzebieg($author$project$Main$ZbierzKartyB))
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Zbierz graczu B')
+					]));
 		}
 	}
-	return $elm$core$Basics$LT;
-};
-var $author$project$Main$zTupli = $elm$core$List$map(
-	function (x) {
-		return x.a;
-	});
-var $author$project$Main$porownajKarty = function (lCS) {
-	return $author$project$Cards$compareCardsWar(
-		$author$project$Main$zTupli(lCS));
 };
 var $author$project$Main$StartGry = {$: 'StartGry'};
 var $author$project$Main$start = _List_fromArray(
@@ -5798,78 +5899,6 @@ var $author$project$Main$start = _List_fromArray(
 				$elm$html$Html$text('Start Gry')
 			]))
 	]);
-var $author$project$Main$wezKarteZReki = function (lc) {
-	var _v0 = $elm$core$List$head(lc);
-	if (_v0.$ === 'Nothing') {
-		return _Debug_todo(
-			'Main',
-			{
-				start: {line: 161, column: 36},
-				end: {line: 161, column: 40}
-			})('');
-	} else {
-		var x = _v0.a;
-		return x;
-	}
-};
-var $author$project$Main$ZbierzKartyA = {$: 'ZbierzKartyA'};
-var $author$project$Main$wygranyGracz = F2(
-	function (ord, mn) {
-		switch (ord.$) {
-			case 'GT':
-				if (mn.$ === 'GraPrzebieg') {
-					var kolej = mn.a.kolej;
-					if (kolej.$ === 'KolejA') {
-						return A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$elm$html$Html$Events$onClick(
-									$author$project$Main$MsgPrzebieg($author$project$Main$ZbierzKartyA))
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Zbierz graczu A !')
-								]));
-					} else {
-						return A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$disabled(true)
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Zagraj graczu aaaaB !')
-								]));
-					}
-				} else {
-					return A2(
-						$elm$html$Html$div,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('to 1 ')
-							]));
-				}
-			case 'LT':
-				return A2(
-					$elm$html$Html$div,
-					_List_Nil,
-					_List_fromArray(
-						[
-							$elm$html$Html$text('to 2 ')
-						]));
-			default:
-				return A2(
-					$elm$html$Html$div,
-					_List_Nil,
-					_List_fromArray(
-						[
-							$elm$html$Html$text('to 3 ')
-						]));
-		}
-	});
 var $author$project$Main$viewNew = function (x) {
 	switch (x.$) {
 		case 'GraRozpoczecie':
@@ -5915,10 +5944,9 @@ var $author$project$Main$viewNew = function (x) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+								A2($elm$html$Html$Attributes$style, 'display', 'block'),
 								A2($elm$html$Html$Attributes$style, 'margin-top', '50px'),
-								A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
-								A2($elm$html$Html$Attributes$style, 'justify-content', 'center')
+								A2($elm$html$Html$Attributes$style, 'text-align', 'center')
 							]),
 						$author$project$Main$start)
 					]));
@@ -5957,7 +5985,7 @@ var $author$project$Main$viewNew = function (x) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										A2($elm$html$Html$Attributes$style, 'height', '600px'),
+										A2($elm$html$Html$Attributes$style, 'height', '300px'),
 										A2($elm$html$Html$Attributes$style, 'border', '1px solid black'),
 										A2($elm$html$Html$Attributes$style, 'margin', '0px 70px')
 									]),
@@ -5967,8 +5995,8 @@ var $author$project$Main$viewNew = function (x) {
 									])),
 								A2(
 								$author$project$Main$grajA,
-								$author$project$Main$wezKarteZReki(a.rekaGraczA),
-								x)
+								$elm$core$List$head(a.rekaGraczA),
+								a)
 							])),
 						A2(
 						$elm$html$Html$div,
@@ -5986,7 +6014,7 @@ var $author$project$Main$viewNew = function (x) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										A2($elm$html$Html$Attributes$style, 'height', '600px'),
+										A2($elm$html$Html$Attributes$style, 'height', '300px'),
 										A2($elm$html$Html$Attributes$style, 'border', '1px solid black'),
 										A2($elm$html$Html$Attributes$style, 'margin', '0px 70px')
 									]),
@@ -5996,8 +6024,23 @@ var $author$project$Main$viewNew = function (x) {
 									])),
 								A2(
 								$author$project$Main$grajB,
-								$author$project$Main$wezKarteZReki(a.rekaGraczB),
-								x)
+								$elm$core$List$head(a.rekaGraczB),
+								a)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'display', 'block'),
+								A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
+								A2($elm$html$Html$Attributes$style, 'height', '200px'),
+								A2($elm$html$Html$Attributes$style, 'border', '1px solid red'),
+								A2($elm$html$Html$Attributes$style, 'margin-top', '40px')
+							]),
+						_List_fromArray(
+							[
+								$author$project$Main$kartyNaStoleWGrze(
+								$author$project$Main$zTupli(a.kartyNaStole))
 							])),
 						A2(
 						$elm$html$Html$div,
@@ -6009,50 +6052,7 @@ var $author$project$Main$viewNew = function (x) {
 							]),
 						_List_fromArray(
 							[
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										A2($elm$html$Html$Attributes$style, 'height', '300px'),
-										A2($elm$html$Html$Attributes$style, 'border', '1px solid black'),
-										A2($elm$html$Html$Attributes$style, 'margin-top', '40px')
-									]),
-								_List_fromArray(
-									[
-										$author$project$Main$kartyNaStoleWGrze(
-										$author$project$Main$zTupli(a.kartyNaStole)),
-										A2(
-										$elm$html$Html$button,
-										_List_Nil,
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Porównaj')
-											]))
-									])),
-								($elm$core$List$length(a.kartyNaStole) < 2) ? A2(
-								$elm$html$Html$div,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('NIC NIC NIC')
-									])) : A2(
-								$author$project$Main$wygranyGracz,
-								$author$project$Main$porownajKarty(a.kartyNaStole),
-								x),
-								A2(
-								$elm$html$Html$button,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Zbierz karty A')
-									])),
-								A2(
-								$elm$html$Html$button,
-								_List_Nil,
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Zbierz karty B')
-									]))
+								$author$project$Main$przyciskZebraniaKart(a)
 							]))
 					]));
 		default:
@@ -6062,7 +6062,21 @@ var $author$project$Main$viewNew = function (x) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Ekran 3')
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Ekran 3')
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Wygral Gracz'),
+								$elm$html$Html$text(a.nazwaGraczaWygranego)
+							]))
 					]));
 	}
 };

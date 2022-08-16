@@ -37,10 +37,10 @@ cardName = \x ->
         FaceCard z y ->
             let cN = polishName y
             in ValidName (case z of
-                    Ace -> ("As " ++ cN)
-                    King ->  ("K " ++ cN)
-                    Queen -> ("Q " ++ cN)
-                    Jack -> ("J " ++ cN)
+                    Ace -> ("As" ++ cN)
+                    King ->  ("K" ++ cN)
+                    Queen -> ("Q" ++ cN)
+                    Jack -> ("J" ++ cN)
                     )
         Numeral y z ->
             let cN = polishName z
@@ -83,10 +83,8 @@ allRegularCardsOfColor: CardColor -> List Card
 allRegularCardsOfColor cc =
     List.map (\x -> Numeral x cc) numbers
 
-wyrzucKarte : List Card -> List Card -> List Card
-wyrzucKarte lc1 lc = case head lc1 of
-                            Nothing -> todo ""
-                            Just x -> (List.filter (\z -> not ( x == z )) lc)
+wyrzucKarte : Card -> List Card -> List Card
+wyrzucKarte x lc = (List.filter (\z -> not ( x == z )) lc)
 
 --List.concat (List.filter (\x -> not ( lc1 == x )) [lc])
 
@@ -111,13 +109,13 @@ compare1 f1 f2 = compare (changeFaceToInt f1) (changeFaceToInt f2)
         (Jack , Jack ) -> EQ
         (Jack , _ ) -> GT-}
 
-compareCardsWar : List Card -> Order
-compareCardsWar lc =
-    case lc of
-      ( [FaceCard x _ , FaceCard a _]) -> compare1 x a
-      ( [FaceCard y _ , Numeral x _ ]) -> GT
-      ( [Numeral x _ , Numeral z _ ]) -> compare x z
-      _ -> LT
+compareCardsWar : Card -> Card ->  Order
+compareCardsWar c1 c2 =
+    case (c1 , c2) of
+      ( FaceCard x _ , FaceCard a _) -> compare1 x a
+      ( FaceCard _ _ , Numeral _ _ ) -> GT
+      ( Numeral x _ , Numeral z _ ) -> compare x z
+      ( Numeral _ _ , FaceCard _ _ )-> LT
 
 
 -- czy funkcja compare powinnaprzyjmować : Tuple (nazwaGraczaA , wyrzuconaKartagraczaA) , (nazwaGraczaB , wyrzuconaKartagraczaB)
