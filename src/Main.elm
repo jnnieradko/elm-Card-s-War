@@ -121,7 +121,7 @@ viewNew ( x ) =
                                                                  , grajB (head a.rekaGraczB) a
                                                                  ]
                             ,div [style "display" "block", style "text-align" "center" , style "height" "200px", style "border" "1px solid red", style "margin-top" "40px"]
-                                                                [ kartyNaStoleWGrze (zTupli a.kartyNaStole)  ]
+                                                                [ kartyNaStoleWGrze (zTupli a.kartyNaStole) , text "Stół", wyswietlWynik a ]
                                                                 , div [style "display" "block" , style "margin-top" "10px", style "text-align" "center"] [przyciskZebraniaKart a]
 
                                    ]
@@ -153,7 +153,7 @@ cardHtml = \x ->
                           , style "background-color" "lightgrey"
                           , style "display" "inline-block"
                           , style "margin" "5px"
-                          , style "width" "30px"
+                          , style "width" "32px"
                           , style "height" "40px"
                                 ] [text n ]
        InvalidCard -> div [] [text "bald!"]
@@ -207,16 +207,29 @@ grajA : Maybe Card -> ModelPrzebieg -> Html Msg
 grajA mbc mp =
       case mbc of
         Nothing -> div [] []
-        Just c -> button [onClick (MsgPrzebieg(ZagrajA c )), disabled (not (czyMozeZagracKarte GraczA mp))] [text "Zagraj graczu A !"]
+        Just c -> button [onClick (MsgPrzebieg(ZagrajA c )), disabled (not (czyMozeZagracKarte GraczA mp) || czyKoniecGry mp == True)] [text "Zagraj graczu A !"]
 
 
 grajB : Maybe Card -> ModelPrzebieg -> Html Msg
 grajB mbc mp =
    case mbc of
-     Nothing -> if mp.rekaGraczB == [] && mp.kartyNaStole == [] then div [onClick (MsgPrzebieg(ZakonczGre))] [text "Przegrałeś"] else div [] []  -- todo "po pojawieniu się diva ma się wysłać MSG ? ? "
-     Just c -> button [onClick (MsgPrzebieg(ZagrajB c )), disabled (not (czyMozeZagracKarte GraczB mp))] [text "Zagraj graczu B !"]
+     Nothing -> div [] []--if mp.rekaGraczB == [] && mp.kartyNaStole == [] then div [onClick (MsgPrzebieg(ZakonczGre))] [text "Przegrałeś"] else div [] []  -- todo "po pojawieniu się diva ma się wysłać MSG ? ? "
+     Just c -> button [onClick (MsgPrzebieg(ZagrajB c )), disabled (not (czyMozeZagracKarte GraczB mp)|| czyKoniecGry mp == True)] [text "Zagraj graczu B !"]
 
 
+czyKoniecGry : ModelPrzebieg-> Bool
+czyKoniecGry mp = if (mp.rekaGraczA == [] || mp.rekaGraczB == []) && mp.kartyNaStole == [] then True else False
+
+wyswietlWynik : ModelPrzebieg -> Html Msg
+wyswietlWynik mp = case czyKoniecGry mp  of
+                    True -> case List.length mp.rekaGraczA  of
+                            0 -> div [] [text "KONIEC GRY - Wygrał Gracz " , text mp.nazwaGraczaB]
+                            _ -> div [] [text "KONIEC GRY - Wygrał Gracz " , text mp.nazwaGraczaA]
+                    False -> div [] []
+
+
+
+                   -- False -> div [] [text "?????????"]
 
 zTupli : List (Card,Gracz) -> List Card
 zTupli = List.map (\x -> Tuple.first x)

@@ -5486,6 +5486,9 @@ var $author$project$Main$ZagrajA = function (a) {
 	return {$: 'ZagrajA', a: a};
 };
 var $elm$html$Html$button = _VirtualDom_node('button');
+var $author$project$Main$czyKoniecGry = function (mp) {
+	return ((_Utils_eq(mp.rekaGraczA, _List_Nil) || _Utils_eq(mp.rekaGraczB, _List_Nil)) && _Utils_eq(mp.kartyNaStole, _List_Nil)) ? true : false;
+};
 var $author$project$Main$czyJegoKolej = F2(
 	function (g, mp) {
 		var _v0 = _Utils_Tuple2(g, mp.kolej);
@@ -5673,7 +5676,7 @@ var $author$project$Main$grajA = F2(
 						$author$project$Main$MsgPrzebieg(
 							$author$project$Main$ZagrajA(c))),
 						$elm$html$Html$Attributes$disabled(
-						!A2($author$project$Main$czyMozeZagracKarte, $author$project$Main$GraczA, mp))
+						(!A2($author$project$Main$czyMozeZagracKarte, $author$project$Main$GraczA, mp)) || $author$project$Main$czyKoniecGry(mp))
 					]),
 				_List_fromArray(
 					[
@@ -5684,21 +5687,10 @@ var $author$project$Main$grajA = F2(
 var $author$project$Main$ZagrajB = function (a) {
 	return {$: 'ZagrajB', a: a};
 };
-var $author$project$Main$ZakonczGre = {$: 'ZakonczGre'};
 var $author$project$Main$grajB = F2(
 	function (mbc, mp) {
 		if (mbc.$ === 'Nothing') {
-			return (_Utils_eq(mp.rekaGraczB, _List_Nil) && _Utils_eq(mp.kartyNaStole, _List_Nil)) ? A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Events$onClick(
-						$author$project$Main$MsgPrzebieg($author$project$Main$ZakonczGre))
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Przegrałeś')
-					])) : A2($elm$html$Html$div, _List_Nil, _List_Nil);
+			return A2($elm$html$Html$div, _List_Nil, _List_Nil);
 		} else {
 			var c = mbc.a;
 			return A2(
@@ -5709,7 +5701,7 @@ var $author$project$Main$grajB = F2(
 						$author$project$Main$MsgPrzebieg(
 							$author$project$Main$ZagrajB(c))),
 						$elm$html$Html$Attributes$disabled(
-						!A2($author$project$Main$czyMozeZagracKarte, $author$project$Main$GraczB, mp))
+						(!A2($author$project$Main$czyMozeZagracKarte, $author$project$Main$GraczB, mp)) || $author$project$Main$czyKoniecGry(mp))
 					]),
 				_List_fromArray(
 					[
@@ -5810,7 +5802,7 @@ var $author$project$Main$cardHtml = function (x) {
 					A2($elm$html$Html$Attributes$style, 'background-color', 'lightgrey'),
 					A2($elm$html$Html$Attributes$style, 'display', 'inline-block'),
 					A2($elm$html$Html$Attributes$style, 'margin', '5px'),
-					A2($elm$html$Html$Attributes$style, 'width', '30px'),
+					A2($elm$html$Html$Attributes$style, 'width', '32px'),
 					A2($elm$html$Html$Attributes$style, 'height', '40px')
 				]),
 			_List_fromArray(
@@ -5899,6 +5891,33 @@ var $author$project$Main$start = _List_fromArray(
 				$elm$html$Html$text('Start Gry')
 			]))
 	]);
+var $author$project$Main$wyswietlWynik = function (mp) {
+	var _v0 = $author$project$Main$czyKoniecGry(mp);
+	if (_v0) {
+		var _v1 = $elm$core$List$length(mp.rekaGraczA);
+		if (!_v1) {
+			return A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('KONIEC GRY - Wygrał Gracz'),
+						$elm$html$Html$text(mp.nazwaGraczaB)
+					]));
+		} else {
+			return A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('KONIEC GRY - Wygrał Gracz'),
+						$elm$html$Html$text(mp.nazwaGraczaA)
+					]));
+		}
+	} else {
+		return A2($elm$html$Html$div, _List_Nil, _List_Nil);
+	}
+};
 var $author$project$Main$viewNew = function (x) {
 	switch (x.$) {
 		case 'GraRozpoczecie':
@@ -6040,7 +6059,9 @@ var $author$project$Main$viewNew = function (x) {
 						_List_fromArray(
 							[
 								$author$project$Main$kartyNaStoleWGrze(
-								$author$project$Main$zTupli(a.kartyNaStole))
+								$author$project$Main$zTupli(a.kartyNaStole)),
+								$elm$html$Html$text('Stół'),
+								$author$project$Main$wyswietlWynik(a)
 							])),
 						A2(
 						$elm$html$Html$div,
