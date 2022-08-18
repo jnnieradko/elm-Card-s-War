@@ -34,8 +34,6 @@ type MPrzebieg = ZagrajA Card      -- rekaGraczA : List Card - Card , kartyNaSto
                | ZagrajB Card     -- rekaGraczB : List Card - Card , kartyNaStole : List Card ++ [Card] , kolej : KolejB
                | ZbierzKartyA -- compareCardsWar zwróci Order GT , rekaGraczA : lc + kartyNaStole [lc]
                | ZbierzKartyB -- compareCardsWar zwróci Order LT , rekaGraczA : lc + kartyNaStole [lc]
-               | ZakonczGre
-               --| KartySaRowne
 
 type MZakonczenie = KontynuujGre        -- zmień model na GraPrzebieg z aktualnymi graczami
                   | RozpocznijNowaGre   -- zmień model na GraRozpoczecie
@@ -57,8 +55,8 @@ updateNew msg m =
                         UpdateNameB s -> GraRozpoczecie { gr | nazwaGraczaB = s}
                         StartGry -> GraPrzebieg { nazwaGraczaA = gr.nazwaGraczaA
                                                 , nazwaGraczaB = gr.nazwaGraczaB
-                                                , rekaGraczA = {-Tuple.first(rozdanieKart deckOfCards)-} [FaceCard Ace Spades, FaceCard Jack Spades {-, FaceCard Queen Hearts, FaceCard King Clubs-} ]
-                                                , rekaGraczB = {-Tuple.second(rozdanieKart deckOfCards)-} [FaceCard King Spades,FaceCard Queen Spades {-, FaceCard Queen Diamonds , FaceCard Jack Clubs , Numeral 10 Hearts-} ]
+                                                , rekaGraczA = {-Tuple.first(rozdanieKart deckOfCards)-} [FaceCard Ace Spades, FaceCard Jack Spades ]
+                                                , rekaGraczB = {-Tuple.second(rozdanieKart deckOfCards)-} [FaceCard King Spades,FaceCard Queen Spades ]
                                                 , kartyNaStole = []
                                                 , kolej = KolejA
                                                 }
@@ -78,18 +76,17 @@ updateNew msg m =
                                                       , kolej = KolejB
                                                       , kartyNaStole = []
                                                     }
-                        ZakonczGre -> GraZakonczenie {nazwaGraczaWygranego = "WyGRANY" , nazwaGraczaPrzegranego = "Przegrany"}
 
-        (MsgZakonczenie mz , GraZakonczenie gz) ->
+        (MsgZakonczenie mz , GraPrzebieg gp) ->
                    case mz of
-                        KontynuujGre -> GraPrzebieg { nazwaGraczaA = gz.nazwaGraczaWygranego
-                                                    , nazwaGraczaB = gz.nazwaGraczaPrzegranego
-                                                    , rekaGraczA = {-Tuple.first(rozdanieKart deckOfCards)-} [FaceCard Ace Spades, FaceCard Jack Spades , FaceCard Queen Hearts, FaceCard King Clubs ]
-                                                    , rekaGraczB = {-Tuple.second(rozdanieKart deckOfCards)-} [FaceCard King Spades,FaceCard Queen Spades , FaceCard Queen Diamonds , FaceCard Jack Clubs , Numeral 10 Hearts ]
+                        KontynuujGre -> GraPrzebieg { nazwaGraczaA = gp.nazwaGraczaA
+                                                    , nazwaGraczaB = gp.nazwaGraczaB
+                                                    , rekaGraczA = {-Tuple.first(rozdanieKart deckOfCards)-} [FaceCard Ace Spades, FaceCard Jack Spades {-, FaceCard Queen Hearts, FaceCard King Clubs-} ]
+                                                    , rekaGraczB = {-Tuple.second(rozdanieKart deckOfCards)-} [FaceCard King Spades,FaceCard Queen Spades {-, FaceCard Queen Diamonds , FaceCard Jack Clubs , Numeral 10 Hearts-} ]
                                                     , kartyNaStole = []
                                                     , kolej = KolejA
                                                     }
-                        RozpocznijNowaGre -> GraRozpoczecie {nazwaGraczaA = "" , nazwaGraczaB = ""}
+                        RozpocznijNowaGre -> initNew
         _ -> m
 
 
@@ -121,7 +118,7 @@ viewNew ( x ) =
                                                                  , grajB (head a.rekaGraczB) a
                                                                  ]
                             ,div [style "display" "block", style "text-align" "center" , style "height" "200px", style "border" "1px solid red", style "margin-top" "40px"]
-                                                                [ kartyNaStoleWGrze (zTupli a.kartyNaStole) , text "Stół", wyswietlWynik a ]
+                                                                [ kartyNaStoleWGrze (zTupli a.kartyNaStole) , text "Stół", wyswietlWynik x ]
                                                                 , div [style "display" "block" , style "margin-top" "10px", style "text-align" "center"] [przyciskZebraniaKart a]
 
                                    ]
@@ -197,11 +194,6 @@ czyMoznaZebrac mp =
                  GT -> Just GraczB
           _ -> Nothing
 
--- List.length mp.kartyNaStole > 2 && List.length mp.kartyNaStole modBy 2
--- dl > 2 , dł parzysta , Order != EQ , nie mozna zebrac - > Nothing
-
---if List.length     --if List.length mp.kartyNaStole >= 2 then wygranyGracz (porownajKarty mp.kartyNaStole) mp else False
-
 
 grajA : Maybe Card -> ModelPrzebieg -> Html Msg
 grajA mbc mp =
@@ -213,30 +205,25 @@ grajA mbc mp =
 grajB : Maybe Card -> ModelPrzebieg -> Html Msg
 grajB mbc mp =
    case mbc of
-     Nothing -> div [] []--if mp.rekaGraczB == [] && mp.kartyNaStole == [] then div [onClick (MsgPrzebieg(ZakonczGre))] [text "Przegrałeś"] else div [] []  -- todo "po pojawieniu się diva ma się wysłać MSG ? ? "
+     Nothing -> div [] []
      Just c -> button [onClick (MsgPrzebieg(ZagrajB c )), disabled (not (czyMozeZagracKarte GraczB mp)|| czyKoniecGry mp == True)] [text "Zagraj graczu B !"]
 
 
 czyKoniecGry : ModelPrzebieg-> Bool
 czyKoniecGry mp = if (mp.rekaGraczA == [] || mp.rekaGraczB == []) && mp.kartyNaStole == [] then True else False
 
-wyswietlWynik : ModelPrzebieg -> Html Msg
-wyswietlWynik mp = case czyKoniecGry mp  of
-                    True -> case List.length mp.rekaGraczA  of
-                            0 -> div [] [text "KONIEC GRY - Wygrał Gracz " , text mp.nazwaGraczaB]
-                            _ -> div [] [text "KONIEC GRY - Wygrał Gracz " , text mp.nazwaGraczaA]
-                    False -> div [] []
-
-
-
-                   -- False -> div [] [text "?????????"]
+wyswietlWynik : ModelNew -> Html Msg
+wyswietlWynik mn = case mn of
+                        GraPrzebieg mp -> case czyKoniecGry mp of
+                                True -> case List.length mp.rekaGraczA  of
+                                     0 -> div [] [text "KONIEC GRY - Wygrał Gracz " , text mp.nazwaGraczaB , br [] [] , br [] [] , button [onClick (MsgZakonczenie(KontynuujGre))] [text "Kontynuuj Grę"], button [onClick (MsgZakonczenie(RozpocznijNowaGre))] [text "Rozpocznij nowa Grę"]]
+                                     _ -> div [] [text "KONIEC GRY - Wygrał Gracz " , text mp.nazwaGraczaA ,br [] [] , br [] [] , button [onClick (MsgZakonczenie(KontynuujGre))] [text "Kontynuuj Grę"], button [onClick (MsgZakonczenie(RozpocznijNowaGre))] [text "Rozpocznij nowa Grę"]]
+                                False -> div [] []
+                        _ -> div [] []
 
 zTupli : List (Card,Gracz) -> List Card
 zTupli = List.map (\x -> Tuple.first x)
 
-
---porownajKarty : List (Card,Gracz) -> Order
---porownajKarty lCG =  compareCardsWar (zTupli lCG)
 
 przyciskZebraniaKart : ModelPrzebieg -> Html Msg
 przyciskZebraniaKart mp = case czyMoznaZebrac mp of
