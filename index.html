@@ -4384,11 +4384,6 @@ function _Browser_load(url)
 		}
 	}));
 }
-var $author$project$Main$GraRozpoczecie = function (a) {
-	return {$: 'GraRozpoczecie', a: a};
-};
-var $author$project$Main$initNew = $author$project$Main$GraRozpoczecie(
-	{nazwaGraczaA: '', nazwaGraczaB: ''});
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
@@ -5177,28 +5172,20 @@ var $elm$core$Task$perform = F2(
 			$elm$core$Task$Perform(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
+var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$GraRozpoczecie = function (a) {
+	return {$: 'GraRozpoczecie', a: a};
+};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Main$initNew = function (_v0) {
+	return _Utils_Tuple2(
+		$author$project$Main$GraRozpoczecie(
+			{nazwaGraczaA: '', nazwaGraczaB: ''}),
+		$elm$core$Platform$Cmd$none);
+};
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $elm$browser$Browser$sandbox = function (impl) {
-	return _Browser_element(
-		{
-			init: function (_v0) {
-				return _Utils_Tuple2(impl.init, $elm$core$Platform$Cmd$none);
-			},
-			subscriptions: function (_v1) {
-				return $elm$core$Platform$Sub$none;
-			},
-			update: F2(
-				function (msg, model) {
-					return _Utils_Tuple2(
-						A2(impl.update, msg, model),
-						$elm$core$Platform$Cmd$none);
-				}),
-			view: impl.view
-		});
-};
 var $author$project$Cards$Ace = {$: 'Ace'};
 var $author$project$Cards$FaceCard = F2(
 	function (a, b) {
@@ -5248,7 +5235,7 @@ var $author$project$Main$updateNew = F2(
 			switch (_v0.a.$) {
 				case 'NoOp':
 					var _v1 = _v0.a;
-					return m;
+					return _Utils_Tuple2(m, $elm$core$Platform$Cmd$none);
 				case 'MsgRozpoczecie':
 					if (_v0.b.$ === 'GraRozpoczecie') {
 						var mr = _v0.a.a;
@@ -5256,34 +5243,40 @@ var $author$project$Main$updateNew = F2(
 						switch (mr.$) {
 							case 'UpdateNameA':
 								var s = mr.a;
-								return $author$project$Main$GraRozpoczecie(
-									_Utils_update(
-										gr,
-										{nazwaGraczaA: s}));
+								return _Utils_Tuple2(
+									$author$project$Main$GraRozpoczecie(
+										_Utils_update(
+											gr,
+											{nazwaGraczaA: s})),
+									$elm$core$Platform$Cmd$none);
 							case 'UpdateNameB':
 								var s = mr.a;
-								return $author$project$Main$GraRozpoczecie(
-									_Utils_update(
-										gr,
-										{nazwaGraczaB: s}));
+								return _Utils_Tuple2(
+									$author$project$Main$GraRozpoczecie(
+										_Utils_update(
+											gr,
+											{nazwaGraczaB: s})),
+									$elm$core$Platform$Cmd$none);
 							default:
-								return $author$project$Main$GraPrzebieg(
-									{
-										kartyNaStole: _List_Nil,
-										kolej: $author$project$Main$KolejA,
-										nazwaGraczaA: gr.nazwaGraczaA,
-										nazwaGraczaB: gr.nazwaGraczaB,
-										rekaGraczA: _List_fromArray(
-											[
-												A2($author$project$Cards$FaceCard, $author$project$Cards$Ace, $author$project$Cards$Spades),
-												A2($author$project$Cards$FaceCard, $author$project$Cards$Jack, $author$project$Cards$Spades)
-											]),
-										rekaGraczB: _List_fromArray(
-											[
-												A2($author$project$Cards$FaceCard, $author$project$Cards$King, $author$project$Cards$Spades),
-												A2($author$project$Cards$FaceCard, $author$project$Cards$Queen, $author$project$Cards$Spades)
-											])
-									});
+								return _Utils_Tuple2(
+									$author$project$Main$GraPrzebieg(
+										{
+											kartyNaStole: _List_Nil,
+											kolej: $author$project$Main$KolejA,
+											nazwaGraczaA: gr.nazwaGraczaA,
+											nazwaGraczaB: gr.nazwaGraczaB,
+											rekaGraczA: _List_fromArray(
+												[
+													A2($author$project$Cards$FaceCard, $author$project$Cards$Ace, $author$project$Cards$Spades),
+													A2($author$project$Cards$FaceCard, $author$project$Cards$Jack, $author$project$Cards$Spades)
+												]),
+											rekaGraczB: _List_fromArray(
+												[
+													A2($author$project$Cards$FaceCard, $author$project$Cards$King, $author$project$Cards$Spades),
+													A2($author$project$Cards$FaceCard, $author$project$Cards$Queen, $author$project$Cards$Spades)
+												])
+										}),
+									$elm$core$Platform$Cmd$none);
 						}
 					} else {
 						break _v0$4;
@@ -5295,52 +5288,60 @@ var $author$project$Main$updateNew = F2(
 						switch (mp.$) {
 							case 'ZagrajA':
 								var c1 = mp.a;
-								return $author$project$Main$GraPrzebieg(
-									_Utils_update(
-										gp,
-										{
-											kartyNaStole: A2(
-												$elm$core$List$cons,
-												_Utils_Tuple2(c1, $author$project$Main$GraczA),
-												gp.kartyNaStole),
-											kolej: $author$project$Main$KolejB,
-											rekaGraczA: A2($author$project$Cards$wyrzucKarte, c1, gp.rekaGraczA)
-										}));
+								return _Utils_Tuple2(
+									$author$project$Main$GraPrzebieg(
+										_Utils_update(
+											gp,
+											{
+												kartyNaStole: A2(
+													$elm$core$List$cons,
+													_Utils_Tuple2(c1, $author$project$Main$GraczA),
+													gp.kartyNaStole),
+												kolej: $author$project$Main$KolejB,
+												rekaGraczA: A2($author$project$Cards$wyrzucKarte, c1, gp.rekaGraczA)
+											})),
+									$elm$core$Platform$Cmd$none);
 							case 'ZagrajB':
 								var c2 = mp.a;
-								return $author$project$Main$GraPrzebieg(
-									_Utils_update(
-										gp,
-										{
-											kartyNaStole: A2(
-												$elm$core$List$cons,
-												_Utils_Tuple2(c2, $author$project$Main$GraczB),
-												gp.kartyNaStole),
-											kolej: $author$project$Main$KolejA,
-											rekaGraczB: A2($author$project$Cards$wyrzucKarte, c2, gp.rekaGraczB)
-										}));
+								return _Utils_Tuple2(
+									$author$project$Main$GraPrzebieg(
+										_Utils_update(
+											gp,
+											{
+												kartyNaStole: A2(
+													$elm$core$List$cons,
+													_Utils_Tuple2(c2, $author$project$Main$GraczB),
+													gp.kartyNaStole),
+												kolej: $author$project$Main$KolejA,
+												rekaGraczB: A2($author$project$Cards$wyrzucKarte, c2, gp.rekaGraczB)
+											})),
+									$elm$core$Platform$Cmd$none);
 							case 'ZbierzKartyA':
-								return $author$project$Main$GraPrzebieg(
-									_Utils_update(
-										gp,
-										{
-											kartyNaStole: _List_Nil,
-											kolej: $author$project$Main$KolejA,
-											rekaGraczA: _Utils_ap(
-												gp.rekaGraczA,
-												$author$project$Main$zTupli(gp.kartyNaStole))
-										}));
+								return _Utils_Tuple2(
+									$author$project$Main$GraPrzebieg(
+										_Utils_update(
+											gp,
+											{
+												kartyNaStole: _List_Nil,
+												kolej: $author$project$Main$KolejA,
+												rekaGraczA: _Utils_ap(
+													gp.rekaGraczA,
+													$author$project$Main$zTupli(gp.kartyNaStole))
+											})),
+									$elm$core$Platform$Cmd$none);
 							default:
-								return $author$project$Main$GraPrzebieg(
-									_Utils_update(
-										gp,
-										{
-											kartyNaStole: _List_Nil,
-											kolej: $author$project$Main$KolejB,
-											rekaGraczB: _Utils_ap(
-												gp.rekaGraczB,
-												$author$project$Main$zTupli(gp.kartyNaStole))
-										}));
+								return _Utils_Tuple2(
+									$author$project$Main$GraPrzebieg(
+										_Utils_update(
+											gp,
+											{
+												kartyNaStole: _List_Nil,
+												kolej: $author$project$Main$KolejB,
+												rekaGraczB: _Utils_ap(
+													gp.rekaGraczB,
+													$author$project$Main$zTupli(gp.kartyNaStole))
+											})),
+									$elm$core$Platform$Cmd$none);
 						}
 					} else {
 						break _v0$4;
@@ -5350,32 +5351,37 @@ var $author$project$Main$updateNew = F2(
 						var mz = _v0.a.a;
 						var gp = _v0.b.a;
 						if (mz.$ === 'KontynuujGre') {
-							return $author$project$Main$GraPrzebieg(
-								{
-									kartyNaStole: _List_Nil,
-									kolej: $author$project$Main$KolejA,
-									nazwaGraczaA: gp.nazwaGraczaA,
-									nazwaGraczaB: gp.nazwaGraczaB,
-									rekaGraczA: _List_fromArray(
-										[
-											A2($author$project$Cards$FaceCard, $author$project$Cards$Ace, $author$project$Cards$Spades),
-											A2($author$project$Cards$FaceCard, $author$project$Cards$Jack, $author$project$Cards$Spades)
-										]),
-									rekaGraczB: _List_fromArray(
-										[
-											A2($author$project$Cards$FaceCard, $author$project$Cards$King, $author$project$Cards$Spades),
-											A2($author$project$Cards$FaceCard, $author$project$Cards$Queen, $author$project$Cards$Spades)
-										])
-								});
+							return _Utils_Tuple2(
+								$author$project$Main$GraPrzebieg(
+									{
+										kartyNaStole: _List_Nil,
+										kolej: $author$project$Main$KolejA,
+										nazwaGraczaA: gp.nazwaGraczaA,
+										nazwaGraczaB: gp.nazwaGraczaB,
+										rekaGraczA: _List_fromArray(
+											[
+												A2($author$project$Cards$FaceCard, $author$project$Cards$Ace, $author$project$Cards$Spades),
+												A2($author$project$Cards$FaceCard, $author$project$Cards$Jack, $author$project$Cards$Spades)
+											]),
+										rekaGraczB: _List_fromArray(
+											[
+												A2($author$project$Cards$FaceCard, $author$project$Cards$King, $author$project$Cards$Spades),
+												A2($author$project$Cards$FaceCard, $author$project$Cards$Queen, $author$project$Cards$Spades)
+											])
+									}),
+								$elm$core$Platform$Cmd$none);
 						} else {
-							return $author$project$Main$initNew;
+							return _Utils_Tuple2(
+								$author$project$Main$GraRozpoczecie(
+									{nazwaGraczaA: '', nazwaGraczaB: ''}),
+								$elm$core$Platform$Cmd$none);
 						}
 					} else {
 						break _v0$4;
 					}
 			}
 		}
-		return m;
+		return _Utils_Tuple2(m, $elm$core$Platform$Cmd$none);
 	});
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $author$project$Main$MsgRozpoczecie = function (a) {
@@ -6141,8 +6147,15 @@ var $author$project$Main$viewNew = function (x) {
 					]));
 	}
 };
-var $author$project$Main$main = $elm$browser$Browser$sandbox(
-	{init: $author$project$Main$initNew, update: $author$project$Main$updateNew, view: $author$project$Main$viewNew});
+var $author$project$Main$main = $elm$browser$Browser$element(
+	{
+		init: $author$project$Main$initNew,
+		subscriptions: function (_v0) {
+			return $elm$core$Platform$Sub$none;
+		},
+		update: $author$project$Main$updateNew,
+		view: $author$project$Main$viewNew
+	});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));
 

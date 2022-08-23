@@ -9,12 +9,8 @@ import Debug exposing (..)
 import Cards exposing (..)
 import String exposing (..)
 import List.Extra exposing (..)
-import Platform exposing (Program)
-import Platform.Cmd as Cmd exposing (Cmd)
-import Http exposing (..)
 
-
-main = Browser.element { init = initNew, view = viewNew, update = updateNew, subscriptions = \_ -> Sub.none }
+main = Browser.sandbox { init = initNew, view = viewNew, update = updateNew }
 
 type  Kolej = KolejA | KolejB
 type Gracz = GraczA | GraczB
@@ -42,60 +38,56 @@ type MPrzebieg = ZagrajA Card      -- rekaGraczA : List Card - Card , kartyNaSto
 type MZakonczenie = KontynuujGre        -- zmień model na GraPrzebieg z aktualnymi graczami
                   | RozpocznijNowaGre   -- zmień model na GraRozpoczecie
 
-type Result = Error | String
-
 type Msg = NoOp
          | MsgRozpoczecie MRozpoczecie
          | MsgPrzebieg MPrzebieg
          | MsgZakonczenie MZakonczenie
-         | Info Result
 
-initNew : () -> ( ModelNew , Cmd Msg)
-initNew _ = (GraRozpoczecie {nazwaGraczaA = "" , nazwaGraczaB = ""} , Cmd.none )
+initNew = GraRozpoczecie {nazwaGraczaA = "" , nazwaGraczaB = ""}
 
-updateNew : Msg -> ModelNew -> (ModelNew, Cmd Msg)
+updateNew : Msg -> ModelNew -> ModelNew
 updateNew msg m =
     case (msg , m) of
-        (NoOp , _ ) -> (m , Cmd.none)
+        (NoOp , _ ) -> m
         (MsgRozpoczecie mr , GraRozpoczecie gr ) ->
                    case mr of
-                        UpdateNameA s -> (GraRozpoczecie { gr | nazwaGraczaA = s} , Cmd.none)
-                        UpdateNameB s -> (GraRozpoczecie { gr | nazwaGraczaB = s} , Cmd.none)
-                        StartGry -> (GraPrzebieg { nazwaGraczaA = gr.nazwaGraczaA
+                        UpdateNameA s -> GraRozpoczecie { gr | nazwaGraczaA = s}
+                        UpdateNameB s -> GraRozpoczecie { gr | nazwaGraczaB = s}
+                        StartGry -> GraPrzebieg { nazwaGraczaA = gr.nazwaGraczaA
                                                 , nazwaGraczaB = gr.nazwaGraczaB
                                                 , rekaGraczA = {-Tuple.first(rozdanieKart deckOfCards)-} [FaceCard Ace Spades, FaceCard Jack Spades ]
                                                 , rekaGraczB = {-Tuple.second(rozdanieKart deckOfCards)-} [FaceCard King Spades,FaceCard Queen Spades ]
                                                 , kartyNaStole = []
                                                 , kolej = KolejA
-                                                }, Cmd.none)
+                                                }
         (MsgPrzebieg mp , GraPrzebieg gp ) ->
                    case mp of
-                        ZagrajA c1 -> (GraPrzebieg { gp | rekaGraczA = wyrzucKarte c1 gp.rekaGraczA
+                        ZagrajA c1 -> GraPrzebieg { gp | rekaGraczA = wyrzucKarte c1 gp.rekaGraczA
                                                       , kartyNaStole = (c1,GraczA) :: gp.kartyNaStole
-                                                      , kolej = KolejB }, Cmd.none)
-                        ZagrajB c2 -> (GraPrzebieg { gp | rekaGraczB = wyrzucKarte c2 gp.rekaGraczB
+                                                      , kolej = KolejB }
+                        ZagrajB c2 -> GraPrzebieg { gp | rekaGraczB = wyrzucKarte c2 gp.rekaGraczB
                                                       , kartyNaStole = (c2,GraczB) :: gp.kartyNaStole
-                                                      , kolej = KolejA } , Cmd.none)
-                        ZbierzKartyA -> (GraPrzebieg { gp | rekaGraczA = gp.rekaGraczA ++ zTupli(gp.kartyNaStole)
+                                                      , kolej = KolejA } -- pomocnicza funkcja po Zbierz karty , funkcja która sprawdza czy jest koniec gry i czy listy kart da puste i wtedy zwraca GraZakonczenie albo gra Przebie (funkcja przyjmuje GraPrzebieg a zwraca model)
+                        ZbierzKartyA -> GraPrzebieg { gp | rekaGraczA = gp.rekaGraczA ++ zTupli(gp.kartyNaStole)
                                                       , kolej = KolejA
                                                       , kartyNaStole = []
-                                                    } , Cmd.none)
-                        ZbierzKartyB -> (GraPrzebieg { gp | rekaGraczB = gp.rekaGraczB ++ zTupli(gp.kartyNaStole)
+                                                    }
+                        ZbierzKartyB -> GraPrzebieg { gp | rekaGraczB = gp.rekaGraczB ++ zTupli(gp.kartyNaStole)
                                                       , kolej = KolejB
                                                       , kartyNaStole = []
-                                                    } , Cmd.none)
+                                                    }
 
         (MsgZakonczenie mz , GraPrzebieg gp) ->
                    case mz of
-                        KontynuujGre -> (GraPrzebieg { nazwaGraczaA = gp.nazwaGraczaA
+                        KontynuujGre -> GraPrzebieg { nazwaGraczaA = gp.nazwaGraczaA
                                                     , nazwaGraczaB = gp.nazwaGraczaB
                                                     , rekaGraczA = {-Tuple.first(rozdanieKart deckOfCards)-} [FaceCard Ace Spades, FaceCard Jack Spades {-, FaceCard Queen Hearts, FaceCard King Clubs-} ]
                                                     , rekaGraczB = {-Tuple.second(rozdanieKart deckOfCards)-} [FaceCard King Spades,FaceCard Queen Spades {-, FaceCard Queen Diamonds , FaceCard Jack Clubs , Numeral 10 Hearts-} ]
                                                     , kartyNaStole = []
                                                     , kolej = KolejA
-                                                    } , Cmd.none)
-                        RozpocznijNowaGre -> (GraRozpoczecie {nazwaGraczaA = "" , nazwaGraczaB = ""} , Cmd.none)
-        _ -> (m , Cmd.none)
+                                                    }
+                        RozpocznijNowaGre -> initNew
+        _ -> m
 
 
 viewNew : ModelNew -> Html Msg
