@@ -4,6 +4,25 @@ const fs = require("fs")
 const e = require("express");
 const daneGraczyJSON = require("./daneGraczy.json");
 
+let cors = require('cors')
+app.use(cors())
+
+
+
+app.get('/dane', function (req, res) {
+
+  /*  fs.readFile("daneGraczy.json", function (err,data){
+        if (err){
+            console.log(err)
+        } else res.send(data)
+    })*/
+    daneGraczy = "RORO - dane z serwera"
+
+
+
+    res.send(daneGraczy)
+
+})
 
 
 app.get('/daneGraczy', function (req, res) {
@@ -19,6 +38,7 @@ app.get('/daneGraczy', function (req, res) {
     let result = daneGraczyJSON.table.slice(startIndex,endIndex)
 
     res.send(result)
+
 })
 app.get('/', function (req, res) {
 
