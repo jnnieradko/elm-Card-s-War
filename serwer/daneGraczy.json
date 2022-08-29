@@ -1,64 +1,52 @@
-{
-  "table": [
+[
     {
       "graczA": "Asiula",
       "graczB": "Krystian",
-      "wynik": "Asiula",
-      "dataRozgrywki": ""
+      "wynik": 1
     },
     {
       "graczA": "RoRo",
       "graczB": "Staś",
-      "wynik": "RoRo",
-      "data_rozgrywki": ""
+      "wynik": 1
     },
     {
       "graczA": "janek",
       "graczB": "stanek",
-      "wynik": "janek",
-      "dataRozgrywki": ""
+      "wynik": 2
     },
     {
       "graczA": "Ajer",
       "graczB": "Kłębka",
-      "wynik": "Kłębka",
-      "dataRozgrywki": ""
+      "wynik": 2
     },
     {
       "graczA": "AA",
       "graczB": "SS",
-      "wynik": "SS",
-      "dataRozgrywki": ""
+      "wynik": 2
     },
     {
       "graczA": "QQ",
       "graczB": "WW",
-      "wynik": "WW",
-      "dataRozgrywki": ""
+      "wynik": 1
     },
     {
       "graczA": "QQ",
       "graczB": "WW",
-      "wynik": "WW",
-      "dataRozgrywki": ""
+      "wynik": 1
     },
     {
       "graczA": "QQ",
       "graczB": "WW",
-      "wynik": "WW",
-      "dataRozgrywki": ""
+      "wynik": 2
     },
     {
       "graczA": "pp",
       "graczB": "WW",
-      "wynik": "WW",
-      "dataRozgrywki": ""
+      "wynik": 2
     },
     {
       "graczA": "RoRo",
       "graczB": "Jaś",
-      "wynik": "RoRo",
-      "data_rozgrywki": ""
+      "wynik": 2
     }
   ]
-}

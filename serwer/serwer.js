@@ -24,6 +24,18 @@ app.get('/dane', function (req, res) {
 
 })
 
+app.get('/daneGraczyJson', function (req, res) {
+
+
+
+    const daneGraczyJSON = require("./daneGraczy.json")
+
+
+    res.send(daneGraczyJSON)
+
+})
+
+
 
 app.get('/daneGraczy', function (req, res) {
 

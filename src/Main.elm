@@ -12,23 +12,36 @@ import List.Extra exposing (..)
 import Platform exposing (Program)
 import Platform.Cmd as Cmd exposing (Cmd)
 import Http exposing (..)
+import Json.Decode as JD
 
-
+main : Program () ModelNew Msg
 main = Browser.element { init = initNew, view = viewNew, update = updateNew, subscriptions = \_ -> Sub.none }
 
 type  Kolej = KolejA | KolejB
 type Gracz = GraczA | GraczB
+type alias Wyniki = List Rozgrywka
+
+type alias Rozgrywka = { graczA : String
+                        ,graczB : String
+                        ,wynik : Int
+                        }
+
+
+
+
 type alias ModelPrzebieg = { nazwaGraczaA : String
                            , nazwaGraczaB : String
                            , rekaGraczA : List Card
                            , rekaGraczB : List Card
                            , kartyNaStole : List (Card,Gracz)
                            , kolej : Kolej
+                           , statystyki : Result Error String
                            }
 
 type ModelNew = GraRozpoczecie { nazwaGraczaA : String , nazwaGraczaB : String  }
                 | GraPrzebieg ModelPrzebieg
                 | GraZakonczenie { nazwaGraczaWygranego : String , nazwaGraczaPrzegranego : String}
+
 
 type MRozpoczecie = UpdateNameA String    --  z pola Input zapamietuje wpisany String i przekazuje do nazwy gracza A
                   | UpdateNameB String -- z pola Input zapamietuje wpisany String i przekazuje do nazwy gracza B
@@ -38,17 +51,22 @@ type MPrzebieg = ZagrajA Card      -- rekaGraczA : List Card - Card , kartyNaSto
                | ZagrajB Card     -- rekaGraczB : List Card - Card , kartyNaStole : List Card ++ [Card] , kolej : KolejB
                | ZbierzKartyA -- compareCardsWar zwróci Order GT , rekaGraczA : lc + kartyNaStole [lc]
                | ZbierzKartyB -- compareCardsWar zwróci Order LT , rekaGraczA : lc + kartyNaStole [lc]
+               | SendHttpReq
+               | PobierzStatystyki
+
 
 type MZakonczenie = KontynuujGre        -- zmień model na GraPrzebieg z aktualnymi graczami
                   | RozpocznijNowaGre   -- zmień model na GraRozpoczecie
 
-type Result = Error | String
 
 type Msg = NoOp
          | MsgRozpoczecie MRozpoczecie
          | MsgPrzebieg MPrzebieg
          | MsgZakonczenie MZakonczenie
-         | Info Result
+         | DataReceivedFromServer (Result Error String)
+         | PokazStatystyki (Result Error Wyniki)
+
+
 
 initNew : () -> ( ModelNew , Cmd Msg)
 initNew _ = (GraRozpoczecie {nazwaGraczaA = "" , nazwaGraczaB = ""} , Cmd.none )
@@ -63,10 +81,11 @@ updateNew msg m =
                         UpdateNameB s -> (GraRozpoczecie { gr | nazwaGraczaB = s} , Cmd.none)
                         StartGry -> (GraPrzebieg { nazwaGraczaA = gr.nazwaGraczaA
                                                 , nazwaGraczaB = gr.nazwaGraczaB
-                                                , rekaGraczA = {-Tuple.first(rozdanieKart deckOfCards)-} [FaceCard Ace Spades, FaceCard Jack Spades ]
-                                                , rekaGraczB = {-Tuple.second(rozdanieKart deckOfCards)-} [FaceCard King Spades,FaceCard Queen Spades ]
+                                                , rekaGraczA = {-Tuple.first(rozdanieKart deckOfCards)-} [FaceCard Ace Spades{-, FaceCard Jack Spades-} ]
+                                                , rekaGraczB = {-Tuple.second(rozdanieKart deckOfCards)-} [FaceCard King Spades{-,FaceCard Queen Spades-} ]
                                                 , kartyNaStole = []
                                                 , kolej = KolejA
+                                                ,statystyki = Ok ""
                                                 }, Cmd.none)
         (MsgPrzebieg mp , GraPrzebieg gp ) ->
                    case mp of
@@ -84,6 +103,10 @@ updateNew msg m =
                                                       , kolej = KolejB
                                                       , kartyNaStole = []
                                                     } , Cmd.none)
+                        SendHttpReq  ->  (GraPrzebieg { gp | statystyki = Ok "" } , getDataFromServer)
+                        PobierzStatystyki -> case gp.kolej of
+                                                           KolejA -> (GraZakonczenie {nazwaGraczaWygranego = gp.nazwaGraczaA, nazwaGraczaPrzegranego = gp.nazwaGraczaB} , getStats)
+                                                           KolejB -> (GraZakonczenie {nazwaGraczaWygranego = gp.nazwaGraczaA, nazwaGraczaPrzegranego = gp.nazwaGraczaB} , getStats)
 
         (MsgZakonczenie mz , GraPrzebieg gp) ->
                    case mz of
@@ -93,8 +116,14 @@ updateNew msg m =
                                                     , rekaGraczB = {-Tuple.second(rozdanieKart deckOfCards)-} [FaceCard King Spades,FaceCard Queen Spades {-, FaceCard Queen Diamonds , FaceCard Jack Clubs , Numeral 10 Hearts-} ]
                                                     , kartyNaStole = []
                                                     , kolej = KolejA
+                                                    ,statystyki = Ok ""
                                                     } , Cmd.none)
                         RozpocznijNowaGre -> (GraRozpoczecie {nazwaGraczaA = "" , nazwaGraczaB = ""} , Cmd.none)
+
+        (DataReceivedFromServer s, GraPrzebieg gp ) -> (GraPrzebieg { gp | statystyki = s } , Cmd.none)
+        (PokazStatystyki rew, GraPrzebieg gp)  -> case gp.kolej of
+                                                             KolejA -> (GraZakonczenie {nazwaGraczaWygranego = gp.nazwaGraczaA, nazwaGraczaPrzegranego = gp.nazwaGraczaB} , Cmd.none)
+                                                             KolejB -> (GraZakonczenie {nazwaGraczaWygranego = gp.nazwaGraczaA, nazwaGraczaPrzegranego = gp.nazwaGraczaB} , Cmd.none)
         _ -> (m , Cmd.none)
 
 
@@ -128,12 +157,51 @@ viewNew ( x ) =
                             ,div [style "display" "block", style "text-align" "center" , style "height" "200px", style "border" "1px solid red", style "margin-top" "40px"]
                                                                 [ kartyNaStoleWGrze (zTupli a.kartyNaStole) , text "Stół", wyswietlWynik x ]
                                                                 , div [style "display" "block" , style "margin-top" "10px", style "text-align" "center"] [przyciskZebraniaKart a]
+                                                                , div [style "display" "block" , style "margin-top" "10px", style "text-align" "center"] [button [onClick (MsgPrzebieg(PobierzStatystyki)) ] [text "Zobacz na nowym ekranie statystyki JSON"]]
 
                                    ]
         GraZakonczenie a -> div [] [
                             div [] [text "Ekran 3"]
                             ,div [] [text "Wygral Gracz" , text a.nazwaGraczaWygranego]
+                            ,h3 [] [text "Statystyki z pliku JSON"]
+                            , doWyswietleniaJson x
+
                             ]
+
+getStats : Cmd Msg
+getStats = Http.get
+                  { url = "http://localhost:8001/dane"
+                  , expect = Http.expectJson PokazStatystyki wynikiParser
+                  }
+
+rozgrywkaParser : JD.Decoder Rozgrywka
+rozgrywkaParser = JD.map3 Rozgrywka
+                          (JD.field "graczA" JD.string)
+                          (JD.field "graczB" JD.string)
+                          (JD.field "wynik" JD.int)
+
+
+wynikiParser : JD.Decoder Wyniki
+wynikiParser = JD.list rozgrywkaParser
+
+doWyswietleniaJson : Result Error Wyniki -> List(Html Msg)
+doWyswietleniaJson res = case res of
+    Ok wyniki -> (List.map (\x -> tr [] [
+                                        td [] [text x.graczA ]
+                                        ])wyniki)
+    Err er -> case er of
+        _ -> [div [] [text "Coś poszło nie tak, nie ma dostępu do danych"]]
+
+
+
+
+getDataFromServer : Cmd Msg
+getDataFromServer =
+    Http.get
+        { url = "http://localhost:8001/dane"
+        , expect = Http.expectString DataReceivedFromServer
+        }
+
 
 
 
@@ -225,9 +293,17 @@ wyswietlWynik mn = case mn of
                         GraPrzebieg mp -> case czyKoniecGry mp of
                                 True -> case List.length mp.rekaGraczA  of
                                      0 -> div [] [text "KONIEC GRY - Wygrał Gracz " , text mp.nazwaGraczaB , br [] [] , br [] [] , button [onClick (MsgZakonczenie(KontynuujGre))] [text "Kontynuuj Grę"], button [onClick (MsgZakonczenie(RozpocznijNowaGre))] [text "Rozpocznij nowa Grę"]]
-                                     _ -> div [] [text "KONIEC GRY - Wygrał Gracz " , text mp.nazwaGraczaA ,br [] [] , br [] [] , button [onClick (MsgZakonczenie(KontynuujGre))] [text "Kontynuuj Grę"], button [onClick (MsgZakonczenie(RozpocznijNowaGre))] [text "Rozpocznij nowa Grę"]]
+                                     _ -> div [] [text "KONIEC GRY - Wygrał Gracz " , text mp.nazwaGraczaA ,br [] [] , br [] [] , button [onClick (MsgZakonczenie(KontynuujGre))] [text "Kontynuuj Grę"], button [onClick (MsgZakonczenie(RozpocznijNowaGre))] [text "Rozpocznij nowa Grę"], button [onClick (MsgPrzebieg(SendHttpReq))] [text "Zobacz ststystyki"], h3 [] [ text "Statystyki" ], doWyswietlenia mp.statystyki]
                                 False -> div [] []
                         _ -> div [] []
+
+doWyswietlenia : Result Error String -> Html Msg
+doWyswietlenia res = case res of
+    Ok s -> div [] [text s]
+    Err er -> case er of
+        _ -> div [] [text "Coś poszło nie tak, nie ma dostępu do danych"]
+
+
 
 zTupli : List (Card,Gracz) -> List Card
 zTupli = List.map (\x -> Tuple.first x)
